@@ -1,5 +1,6 @@
 import { APIError } from "./APIError.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
+import type { RequestValidationError } from "@ts-rest/express";
 import type { Request, Response, NextFunction } from "express";
 
 function bodyParserHandler(
@@ -55,10 +56,27 @@ function globalErrorHandler(
         });
 }
 
+function requestValidationErrorHandler(
+    err: RequestValidationError,
+    req: Request,
+    res: Response,
+    next: NextFunction
+) {
+    const issue = err.body?.issues[0];
+    const field = issue?.path.join(".");
+
+    const message =
+        issue?.code === "invalid_type" && issue?.message === "Required"
+            ? `${field} is required`
+            : `${field}: ${issue?.message}`;;
+    return next(new APIError(STATUS_CODES.BAD_REQUEST, message));
+}
+
 
 export {
     bodyParserHandler,
     fourOhFourHandler,
     fourOhFiveHandler,
-    globalErrorHandler
+    globalErrorHandler,
+    requestValidationErrorHandler
 }

@@ -7,6 +7,7 @@ import {
     fourOhFourHandler,
     globalErrorHandler
 } from "../error/errorHandler.js";
+import { routerLoader } from "./routesLoader.js";
 
 export function expressLoader(app: Express) {
     app.use(cors({
@@ -17,6 +18,8 @@ export function expressLoader(app: Express) {
     app.use(express.urlencoded({ extended: false }));
     app.use(cookieParser());
     app.use(bodyParserHandler);
+
+    routerLoader(app);
 
     app.use(fourOhFourHandler);
     app.use(globalErrorHandler);
