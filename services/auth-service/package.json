@@ -14,10 +14,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@ts-rest/core": "^3.52.1",
+    "@ts-rest/express": "^3.52.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
-    "express": "^5.2.1"
+    "express": "^4.22.3",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",

@@ -5,14 +5,12 @@ const s = initServer();
 
 export const authRoutes = s.router(authContract, {
     login: async ({ body }) => {
-        console.log("reached controller");
-
         return {
             status: 200,
             body: {
                 success: true,
-                message: "Login successful",
-                accessToken: "dummy-token",
+                message: "Login successful fasdfasdf fasfdsa",
+                accessToken: "dummy-token fsadfsa sadfsdaf",
             },
         };
     },
