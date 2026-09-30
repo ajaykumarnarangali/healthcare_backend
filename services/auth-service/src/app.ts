@@ -1,6 +1,9 @@
 import express from "express";
 const app = express();
-import { expressLoader } from "./loaders/expressLoader.js";
+import {
+    expressLoader,
+    connectDatabase
+} from "./loaders/init.js";
 
 function Loader() {
     expressLoader(app);
