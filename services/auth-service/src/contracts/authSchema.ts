@@ -1,16 +1,5 @@
 import zod from "zod";
 
-export const loginBodySchema = zod.object({
-    email: zod.string().email(),
-    password: zod.string().min(8),
-});
-
-export const loginResponseSchema = zod.object({
-    success: zod.boolean(),
-    message: zod.string(),
-    accessToken: zod.string(),
-});
-
 export const patientRegisterBodySchema = zod.object({
     email: zod
         .string()
@@ -32,7 +21,21 @@ export const patientRegisterBodySchema = zod.object({
         ),
 });
 
+export type PatientRegisterBody =
+    zod.infer<typeof patientRegisterBodySchema>;
+
 export const patientRegisterResponseSchema = zod.object({
     success: zod.boolean(),
     message: zod.string(),
+});
+
+export const loginBodySchema = zod.object({
+    email: zod.string().email(),
+    password: zod.string().min(8),
+});
+
+export const loginResponseSchema = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+    accessToken: zod.string(),
 });

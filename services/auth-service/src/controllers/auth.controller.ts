@@ -1,10 +1,15 @@
 import { APIError } from "../error/APIError.js";
+import { STATUS_CODES } from "../constants/statusCodes.js";
+import type { PatientRegisterRequest } from "../contracts/types.js";
+import * as authService from "../services/auth.service.js";
 
+export async function registerPatient(req: PatientRegisterRequest) {
+    const { email, password } = req.body;
 
-export async function registerPatient(req: any) {
-    throw new APIError(404, "not found");
+    await authService.registerPatient(email, password);
+
     return {
-        status: 201 as const,
+        status: STATUS_CODES.CREATED,
         body: {
             success: true,
             message: "Patient registered successfully",
