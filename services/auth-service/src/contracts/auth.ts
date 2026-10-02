@@ -8,13 +8,20 @@ export const authContract = c.router({
     patientRegister: {
         method: "POST",
         path: `${BASIC_ENDPOINT}/patient/register`,
-
         body: authSchema.patientRegisterBodySchema,
-
         responses: {
-            201: authSchema.patientRegisterResponseSchema,
+            201: authSchema.RegisterResponseSchema,
         },
     },
+
+    doctorRegister: {
+        method: 'POST',
+        path: `${BASIC_ENDPOINT}/doctor/register`,
+        body: authSchema.doctorRegisterBodySchema,
+        responses: {
+            201: authSchema.RegisterResponseSchema,
+        },
+    }
 
     // login: {
     //     method: "POST",

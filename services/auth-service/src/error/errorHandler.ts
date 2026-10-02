@@ -37,6 +37,7 @@ function globalErrorHandler(
     res: Response,
     next: NextFunction
 ) {
+    console.log(err);
     let error: APIError;
 
     if (err instanceof APIError) {
@@ -47,7 +48,6 @@ function globalErrorHandler(
             "Internal server error"
         );
     }
-
     return res
         .status(error.status)
         .json({

@@ -5,8 +5,9 @@ import {
     connectDatabase
 } from "./loaders/init.js";
 
-function Loader() {
-    expressLoader(app);
+async function Loader() {
+  await connectDatabase();
+  expressLoader(app);
 }
 
 export {

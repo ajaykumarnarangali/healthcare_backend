@@ -1,5 +1,8 @@
 import type { Request as ExpressRequest } from "express";
-import type { PatientRegisterBody } from "./authSchema.js";
+import type {
+    PatientRegisterBody,
+    DoctorRegisterBody
+} from "./authSchema.js";
 
 type AppRequest<
     TQuery = undefined,
@@ -16,5 +19,11 @@ type AppRequest<
 export type PatientRegisterRequest = AppRequest<
     undefined,
     PatientRegisterBody,
+    undefined
+>;
+
+export type DoctorRegisterRequest = AppRequest<
+    undefined,
+    DoctorRegisterBody,
     undefined
 >;

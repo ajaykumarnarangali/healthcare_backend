@@ -8,5 +8,8 @@ const s = initServer();
 export const authRoutes = s.router(authContract, {
     patientRegister: {
         handler: async (r) => callController(authController.registerPatient)(r),
-    }
+    },
+    doctorRegister: {
+        handler: async (r) => callController(authController.registerDoctor)(r),
+    },
 });

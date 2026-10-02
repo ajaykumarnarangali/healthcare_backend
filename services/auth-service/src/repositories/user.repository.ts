@@ -1,5 +1,4 @@
 import { getPool } from "../loaders/postgresLoader.js";
-import { USER_ROLES } from "../constants/user.constants.js";
 
 export async function getUser(email: string) {
     const pool = getPool();
@@ -15,15 +14,16 @@ export async function getUser(email: string) {
 
 export async function createUser(
     email: string,
-    passwordHash: string
+    passwordHash: string,
+    role: string
 ) {
     const pool = getPool();
 
     const result = await pool.query(
         `INSERT INTO users (email, password_hash,role)
-        VALUES ($1, $2)
+        VALUES ($1, $2, $3)
         RETURNING id, email`,
-        [email, passwordHash, USER_ROLES.PATIENT]
+        [email, passwordHash, role]
     );
 
     return result.rows[0];

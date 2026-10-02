@@ -4,7 +4,7 @@ dotenv.config();
 
 
 (async () => {
-    Loader();
+    await Loader();
     const PORT = process.env.PORT || 3000;
 
     app.listen(PORT, () => {

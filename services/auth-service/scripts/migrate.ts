@@ -63,6 +63,8 @@ async function DoMigration() {
     } catch (error) {
         console.error("Migration failed:", error);
         process.exit(1);
+    } finally {
+        await client.end();
     }
 }
 
