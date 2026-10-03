@@ -2,7 +2,8 @@ import express from "express";
 import {
   expressLoader,
   connectDatabase,
-  connectRabbitMQ
+  connectRabbitMQ,
+  connectRedis
 } from "./loaders/init.js";
 
 const app = express();
@@ -10,6 +11,7 @@ const app = express();
 async function Loader() {
   await connectDatabase();
   await connectRabbitMQ();
+  await connectRedis();
   expressLoader(app);
 }
 

@@ -2,7 +2,7 @@ import express from "express";
 import {
     connectRabbitMQ,
     initRabbitMQ
-} from "./loaders/queueLoader.js";
+} from "./loaders/init.js";
 
 const app = express();
 import {

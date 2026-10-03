@@ -1,18 +1,97 @@
 import bcrypt from "bcrypt";
 import { APIError } from "../error/APIError.js";
-import { STATUS_CODES } from "../constants/statusCodes.js";
-import { USER_ROLES } from "../constants/user.constants.js";
+import { retry } from "../utils/retry.js";
 import * as userRepository from "../repositories/user.repository.js";
+import { getRabbitMQChannel, getRedisClient } from "../loaders/init.js";
+import { logger } from "../utils/logger.js";
+import {
+    USER_ROLES,
+    REDIS_KEYS,
+    STATUS_CODES,
+    RABBITMQ_EXCHANGE,
+    USER_EMAIL_VERIFICATION_REQUESTED,
+} from "../constants/index.js";
+import {
+    hashVerificationToken,
+    generateVerificationToken
+} from "../utils/token.utils.js";
+
 
 export async function registerPatient(email: string, password: string) {
+    logger.info({ email }, "Patient registration started");
 
     const existingUser = await userRepository.getUser(email);
+
     if (existingUser) {
-        throw new APIError(STATUS_CODES.CONFLICT, "User with this email already exists");
+        logger.warn({ email }, "Patient registration rejected: email already exists");
+
+        throw new APIError(
+            STATUS_CODES.CONFLICT,
+            "User with this email already exists"
+        );
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await userRepository.createUser(email, passwordHash, USER_ROLES.PATIENT);
+
+    const user = await userRepository.createUser(
+        email,
+        passwordHash,
+        USER_ROLES.PATIENT
+    );
+
+    logger.info(
+        { userId: user.id },
+        "Patient user created successfully"
+    );
+
+    const verificationToken = generateVerificationToken();
+    const tokenHash = hashVerificationToken(verificationToken);
+
+    const redisClient = getRedisClient();
+
+    await retry(
+        () =>
+            redisClient.set(
+                REDIS_KEYS.emailVerification(user.id),
+                tokenHash,
+                {
+                    EX: 900,
+                }
+            ),
+        3,
+        2000,
+        "Store email verification token in Redis"
+    );
+
+    logger.info(
+        { userId: user.id },
+        "Email verification token stored in Redis"
+    );
+
+    const rabbitChannel = getRabbitMQChannel();
+
+    await retry(
+        () =>
+            rabbitChannel.publish(
+                RABBITMQ_EXCHANGE,
+                USER_EMAIL_VERIFICATION_REQUESTED,
+                Buffer.from(
+                    JSON.stringify({
+                        userId: user.id,
+                        email: user.email,
+                        verificationToken,
+                    })
+                )
+            ),
+        3,
+        2000,
+        "Publish email verification event"
+    );
+
+    logger.info(
+        { userId: user.id },
+        "Email verification event published"
+    );
 
     return user;
 }
@@ -36,12 +115,78 @@ export function verifyLicenseNumber(licenseNumber: string): boolean {
 export async function registerDoctor(email: string, password: string) {
 
     const existingUser = await userRepository.getUser(email);
+
     if (existingUser) {
-        throw new APIError(STATUS_CODES.CONFLICT, "User with this email already exists");
+        logger.warn({ email }, "Patient registration rejected: email already exists");
+
+        throw new APIError(
+            STATUS_CODES.CONFLICT,
+            "User with this email already exists"
+        );
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
-    const user = await userRepository.createUser(email, passwordHash, USER_ROLES.DOCTOR);
+
+    const user = await userRepository.createUser(
+        email,
+        passwordHash,
+        USER_ROLES.DOCTOR
+    );
+
+    logger.info(
+        { userId: user.id },
+        "Patient user created successfully"
+    );
+
+    const verificationToken = generateVerificationToken();
+    const tokenHash = hashVerificationToken(verificationToken);
+
+    const redisClient = getRedisClient();
+
+    await retry(
+        () =>
+            redisClient.set(
+                REDIS_KEYS.emailVerification(user.id),
+                tokenHash,
+                {
+                    EX: 900,
+                }
+            ),
+        3,
+        2000,
+        "Store doctor email verification token in Redis"
+    );
+
+    logger.info(
+        { userId: user.id },
+        "Email verification token stored in Redis"
+    );
+
+
+    const rabbitChannel = getRabbitMQChannel();
+
+    await retry(
+        () =>
+            rabbitChannel.publish(
+                RABBITMQ_EXCHANGE,
+                USER_EMAIL_VERIFICATION_REQUESTED,
+                Buffer.from(
+                    JSON.stringify({
+                        userId: user.id,
+                        email: user.email,
+                        verificationToken,
+                    })
+                )
+            ),
+        3,
+        2000,
+        "Publish doctor email verification event"
+    );
+
+    logger.info(
+        { userId: user.id },
+        "Email verification event published"
+    );
 
     return user;
 }
