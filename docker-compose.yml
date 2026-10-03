@@ -30,6 +30,28 @@ services:
       CHOKIDAR_INTERVAL: "500"
     depends_on:
       - postgres
+      - rabbitmq
+    networks:
+      - backend_net
+
+  notification-service:
+    build:
+      context: ./services/notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    expose:
+      - "3001"
+    env_file:
+      - ./services/notification-service/.env
+    volumes:
+      - ./services/notification-service:/app
+      - /app/node_modules
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "500"
+    depends_on:
+      - postgres
+      - rabbitmq
     networks:
       - backend_net
     
@@ -48,8 +70,20 @@ services:
     networks:
       - backend_net
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: healthcare-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - backend_net
+
 networks:
   backend_net:
 
 volumes:
   postgres-data:
+  rabbitmq-data:

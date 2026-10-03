@@ -1,16 +1,19 @@
 import express from "express";
-const app = express();
 import {
-    expressLoader,
-    connectDatabase
+  expressLoader,
+  connectDatabase,
+  connectRabbitMQ
 } from "./loaders/init.js";
+
+const app = express();
 
 async function Loader() {
   await connectDatabase();
+  await connectRabbitMQ();
   expressLoader(app);
 }
 
 export {
-    Loader,
-    app
+  Loader,
+  app
 }
