@@ -1,8 +1,5 @@
 import amqp from "amqplib";
-import {
-    RABBITMQ_EXCHANGE,
-    NOTIFICATION_QUEUE
-} from "../constants/rabbitmq.constants.js";
+import * as rabbitmq from "../constants/rabbitmq.constants.js";
 
 let connection: amqp.ChannelModel;
 let channel: amqp.Channel;
@@ -33,14 +30,20 @@ export async function initRabbitMQ() {
         const rabbitChannel = getRabbitMQChannel();
 
         await rabbitChannel.assertExchange(
-            RABBITMQ_EXCHANGE,
+            rabbitmq.RABBITMQ_EXCHANGE,
             "topic",
             { durable: true }
         );
 
         await rabbitChannel.assertQueue(
-            NOTIFICATION_QUEUE,
+            rabbitmq.NOTIFICATION_QUEUE,
             { durable: true }
+        );
+
+        await rabbitChannel.bindQueue(
+            rabbitmq.NOTIFICATION_QUEUE,
+            rabbitmq.RABBITMQ_EXCHANGE,
+            rabbitmq.USER_EMAIL_VERIFICATION_REQUESTED
         );
 
         console.log("RabbitMQ exchange and queue initialized");

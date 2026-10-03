@@ -3,6 +3,7 @@ import {
     connectRabbitMQ,
     initRabbitMQ
 } from "./loaders/init.js";
+import { startNotificationConsumer } from "./consumers/notification.consumer.js";
 
 const app = express();
 import {
@@ -14,6 +15,7 @@ async function Loader() {
     // await connectDatabase();
     await connectRabbitMQ();
     await initRabbitMQ();
+    startNotificationConsumer();
     expressLoader(app);
 }
 

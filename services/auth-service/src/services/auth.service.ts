@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import crypto from "crypto";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
 import * as userRepository from "../repositories/user.repository.js";
@@ -70,6 +71,7 @@ export async function registerPatient(email: string, password: string) {
 
     const rabbitChannel = getRabbitMQChannel();
 
+    const eventId = crypto.randomUUID();
     await retry(
         () =>
             rabbitChannel.publish(
@@ -77,6 +79,7 @@ export async function registerPatient(email: string, password: string) {
                 USER_EMAIL_VERIFICATION_REQUESTED,
                 Buffer.from(
                     JSON.stringify({
+                        eventId,
                         userId: user.id,
                         email: user.email,
                         verificationToken,
@@ -162,9 +165,8 @@ export async function registerDoctor(email: string, password: string) {
         "Email verification token stored in Redis"
     );
 
-
     const rabbitChannel = getRabbitMQChannel();
-
+    const eventId = crypto.randomUUID();
     await retry(
         () =>
             rabbitChannel.publish(
@@ -172,6 +174,7 @@ export async function registerDoctor(email: string, password: string) {
                 USER_EMAIL_VERIFICATION_REQUESTED,
                 Buffer.from(
                     JSON.stringify({
+                        eventId,
                         userId: user.id,
                         email: user.email,
                         verificationToken,

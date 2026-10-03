@@ -8,7 +8,9 @@
     "test": "test"
   },
   "scripts": {
-    "dev": "tsx watch src/server.ts"
+    "dev": "tsx watch src/server.ts",
+    "migration": "tsx scripts/migrate.ts",
+    "start": "npm run migration && npm run dev"
   },
   "keywords": [],
   "author": "",
