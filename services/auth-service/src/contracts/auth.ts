@@ -25,7 +25,7 @@ export const authContract = c.router({
 
     verifyEmail: {
         method: "POST",
-        path: `${BASIC_ENDPOINT}/verify`,
+        path: `${BASIC_ENDPOINT}/verify-email`,
         query: authSchema.verifyEmailSchema,
         body: c.type<undefined>(),
         responses: {
@@ -33,14 +33,12 @@ export const authContract = c.router({
         },
     },
 
-    // login: {
-    //     method: "POST",
-    //     path: `${BASIC_ENDPOINT}/login`,
-
-    //     body: authSchema.loginBodySchema,
-
-    //     responses: {
-    //         200: authSchema.loginResponseSchema
-    //     },
-    // },
+    login: {
+        method: "POST",
+        path: `${BASIC_ENDPOINT}/login`,
+        body: authSchema.loginBodySchema,
+        responses: {
+            200: authSchema.loginResponseSchema
+        },
+    },
 });

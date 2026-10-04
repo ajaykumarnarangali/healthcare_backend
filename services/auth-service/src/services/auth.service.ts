@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
+import { generateJWTToken } from "../utils/token.utils.js";
 import * as userRepository from "../repositories/user.repository.js";
 import { getRabbitMQChannel, getRedisClient } from "../loaders/init.js";
 import { logger } from "../utils/logger.js";
@@ -247,4 +248,40 @@ export async function verifyEmail(userId: string, token: string) {
     );
 
     logger.info({ userId }, "Email verified successfully");
+}
+
+export async function login(email: string, password: string) {
+
+    const DUMMY_PASSWORD_HASH =
+        "$2b$12$PASTE_THE_GENERATED_HASH_HERE";
+
+    const user = await userRepository.getUser(email);
+
+    const passwordHash = user?.password_hash ?? DUMMY_PASSWORD_HASH;
+
+    const isPasswordValid = await bcrypt.compare(
+        password,
+        passwordHash
+    );
+
+    if (!user || !isPasswordValid || !user.email_verified) {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Invalid email or password"
+        );
+    }
+
+    const tokenPayLoad = {
+        sub: user.id,
+        role: user.role
+    }
+
+    const accessToken = generateJWTToken(tokenPayLoad);
+    const refreshToken = generateJWTToken(tokenPayLoad, "refresh");
+
+    return {
+        role: user,
+        accessToken,
+        refreshToken
+    }
 }

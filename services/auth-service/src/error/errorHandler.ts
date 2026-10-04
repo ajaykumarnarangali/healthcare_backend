@@ -58,17 +58,28 @@ function globalErrorHandler(
 
 function requestValidationErrorHandler(
     err: RequestValidationError,
-    req: Request,
+    req: any,
     res: Response,
     next: NextFunction
 ) {
-    const issue = err.body?.issues[0];
+    const source =
+        err.body ? "body" :
+            err.query ? "query" :
+                err.pathParams ? "path params" :
+                    "request";
+
+    const issue =
+        err.body?.issues?.[0] ??
+        err.query?.issues?.[0] ??
+        err.pathParams?.issues?.[0];
+
     const field = issue?.path.join(".");
 
     const message =
         issue?.code === "invalid_type" && issue?.message === "Required"
-            ? `${field} is required`
-            : `${field}: ${issue?.message}`;;
+            ? `${source}.${field} is required`
+            : `${source}.${field}: ${issue?.message}`;
+
     return next(new APIError(STATUS_CODES.BAD_REQUEST, message));
 }
 
