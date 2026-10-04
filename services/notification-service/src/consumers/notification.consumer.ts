@@ -55,7 +55,7 @@ export function startNotificationConsumer() {
 
         } catch (error) {
             logger.error(
-                { error },
+                { err: error },
                 "Failed to process notification event"
             );
 
