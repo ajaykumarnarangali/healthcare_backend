@@ -193,3 +193,58 @@ export async function registerDoctor(email: string, password: string) {
 
     return user;
 }
+
+export async function verifyEmail(userId: string, token: string) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            "User not found"
+        );
+    }
+
+    if (user.email_verified) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Email is already verified"
+        );
+    }
+
+    const redisKey = REDIS_KEYS.emailVerification(userId);
+    const redisClient = getRedisClient();
+
+    const storedTokenHash = await retry(
+        () => redisClient.get(redisKey),
+        3,
+        2000,
+        "Get email verification token from Redis"
+    );
+
+    if (!storedTokenHash) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Verification token has expired"
+        );
+    }
+
+    const hashedToken = hashVerificationToken(token);
+
+    if (hashedToken !== storedTokenHash) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Verification token is not matching"
+        );
+    }
+
+    await userRepository.verifyUser(userId);
+
+    await retry(
+        () => redisClient.del(redisKey),
+        3,
+        2000,
+        "Delete email verification token from Redis"
+    );
+
+    logger.info({ userId }, "Email verified successfully");
+}

@@ -51,12 +51,25 @@ export const doctorRegisterBodySchema = zod.object({
 
 export type DoctorRegisterBody =
     zod.infer<typeof doctorRegisterBodySchema>;
-    
+
 
 export const RegisterResponseSchema = zod.object({
     success: zod.boolean(),
     message: zod.string(),
 });
+
+export const verifyEmailSchema = zod.object({
+    userId: zod.string().uuid(),
+    token: zod.string().min(1),
+}).strict();
+
+export type verifyEmailQuery = zod.infer<typeof verifyEmailSchema>;
+
+export const verifyEmailResponseSchema = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+});
+
 
 export const loginBodySchema = zod.object({
     email: zod.string().email(),

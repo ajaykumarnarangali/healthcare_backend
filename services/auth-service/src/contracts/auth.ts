@@ -21,7 +21,17 @@ export const authContract = c.router({
         responses: {
             201: authSchema.RegisterResponseSchema,
         },
-    }
+    },
+
+    verifyEmail: {
+        method: "POST",
+        path: `${BASIC_ENDPOINT}/verify`,
+        query: authSchema.verifyEmailSchema,
+        body: c.type<undefined>(),
+        responses: {
+            200: authSchema.verifyEmailResponseSchema,
+        },
+    },
 
     // login: {
     //     method: "POST",

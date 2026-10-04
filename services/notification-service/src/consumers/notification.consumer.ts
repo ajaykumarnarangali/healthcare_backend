@@ -44,6 +44,14 @@ export function startNotificationConsumer() {
                         verificationToken: event.verificationToken
                     });
                     await processedEventRepository.markAsProcessed(event.eventId);
+                    logger.info(
+                        {
+                            email: event.email,
+                            eventId: event.eventId,
+                            routingKey: message.fields.routingKey,
+                        },
+                        "Email verification notification processed successfully"
+                    );
                     break;
                 default:
                     throw new Error(

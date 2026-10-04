@@ -1,7 +1,11 @@
 import { APIError } from "../error/APIError.js";
 import { STATUS_CODES } from "../constants/statusCodes.js";
-import type { PatientRegisterRequest, DoctorRegisterRequest } from "../contracts/types.js";
 import * as authService from "../services/auth.service.js";
+import type {
+    PatientRegisterRequest,
+    DoctorRegisterRequest,
+    VerifyEmailRequest
+} from "../contracts/types.js";
 
 export async function registerPatient(req: PatientRegisterRequest) {
     const { email, password } = req.body;
@@ -38,4 +42,19 @@ export async function registerDoctor(req: DoctorRegisterRequest) {
             message: "Doctor registered successfully",
         },
     };
+}
+
+export async function verifyEmail(req: VerifyEmailRequest) {
+
+    const { userId, token } = req.query;
+
+    await authService.verifyEmail(userId, token);
+
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Email verified successfully",
+        }
+    }
 }

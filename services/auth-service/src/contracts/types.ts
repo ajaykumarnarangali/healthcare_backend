@@ -1,7 +1,8 @@
 import type { Request as ExpressRequest } from "express";
 import type {
     PatientRegisterBody,
-    DoctorRegisterBody
+    DoctorRegisterBody,
+    verifyEmailQuery
 } from "./authSchema.js";
 
 type AppRequest<
@@ -25,5 +26,11 @@ export type PatientRegisterRequest = AppRequest<
 export type DoctorRegisterRequest = AppRequest<
     undefined,
     DoctorRegisterBody,
+    undefined
+>;
+
+export type VerifyEmailRequest = AppRequest<
+    verifyEmailQuery,
+    undefined,
     undefined
 >;
