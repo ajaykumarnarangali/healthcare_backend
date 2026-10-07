@@ -22,6 +22,6 @@ export function callControllerWithResponse(controller: Function) {
             raw: r.req,
         };
 
-        return controller(request, r.Response);
+        return controller(request, r.res);
     };
 }

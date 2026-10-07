@@ -3,6 +3,7 @@ import type {
     PatientRegisterBody,
     DoctorRegisterBody,
     verifyEmailQuery,
+    vefifyEmailBody,
     UserLoginBody
 } from "./authSchema.js";
 
@@ -32,7 +33,7 @@ export type DoctorRegisterRequest = AppRequest<
 
 export type VerifyEmailRequest = AppRequest<
     verifyEmailQuery,
-    undefined,
+    vefifyEmailBody,
     undefined
 >;
 

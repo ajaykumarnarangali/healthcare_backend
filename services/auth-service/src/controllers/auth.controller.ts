@@ -49,8 +49,9 @@ export async function registerDoctor(req: DoctorRegisterRequest) {
 export async function verifyEmail(req: VerifyEmailRequest) {
 
     const { userId, token } = req.query;
+    const { password } = req.body;
 
-    await authService.verifyEmail(userId, token);
+    await authService.verifyEmail(userId, token, password);
 
     return {
         status: STATUS_CODES.OK,
@@ -77,7 +78,7 @@ export async function login(req: UserLoginRequest, res: Response) {
         status: STATUS_CODES.OK,
         body: {
             success: true,
-            message: "Email verified successfully",
+            message: "Logged in successfully",
             role,
             accessToken
         }

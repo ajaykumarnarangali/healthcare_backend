@@ -64,6 +64,19 @@ export const verifyEmailSchema = zod.object({
     token: zod.string().min(1),
 }).strict();
 
+export const verifyEmailBodySchema = zod.object({
+    password: zod
+        .string()
+        .min(8)
+        .max(128)
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+        .regex(/[0-9]/, "Password must contain at least one number")
+        .regex(
+            /[^A-Za-z0-9]/,
+            "Password must contain at least one special character"
+        ),
+}).strict();
 
 export const verifyEmailResponseSchema = zod.object({
     success: zod.boolean(),
@@ -71,6 +84,7 @@ export const verifyEmailResponseSchema = zod.object({
 });
 
 export type verifyEmailQuery = zod.infer<typeof verifyEmailSchema>;
+export type vefifyEmailBody = zod.infer<typeof verifyEmailBodySchema>;
 
 
 export const loginBodySchema = zod.object({
@@ -101,4 +115,4 @@ export const loginResponseSchema = zod.object({
 });
 
 export type UserLoginBody =
-    zod.infer<typeof doctorRegisterBodySchema>;
+    zod.infer<typeof loginBodySchema>;

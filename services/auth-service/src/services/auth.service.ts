@@ -5,6 +5,7 @@ import { retry } from "../utils/retry.js";
 import { generateJWTToken } from "../utils/token.utils.js";
 import * as userRepository from "../repositories/user.repository.js";
 import { getRabbitMQChannel, getRedisClient } from "../loaders/init.js";
+import { USER_STATUS } from "../constants/user.constants.js";
 import { logger } from "../utils/logger.js";
 import {
     USER_ROLES,
@@ -25,11 +26,13 @@ export async function registerPatient(email: string, password: string) {
     const existingUser = await userRepository.getUser(email);
 
     if (existingUser) {
-        logger.warn({ email }, "Patient registration rejected: email already exists");
-
+        logger.warn(
+            { email },
+            "Patient registration attempted with existing email"
+        );
         throw new APIError(
-            STATUS_CODES.CONFLICT,
-            "User with this email already exists"
+            STATUS_CODES.BAD_REQUEST,
+            "Unable to complete registration. Please check your details or try another email."
         );
     }
 
@@ -121,11 +124,13 @@ export async function registerDoctor(email: string, password: string) {
     const existingUser = await userRepository.getUser(email);
 
     if (existingUser) {
-        logger.warn({ email }, "Patient registration rejected: email already exists");
-
+        logger.warn(
+            { email },
+            "Patient registration attempted with existing email"
+        );
         throw new APIError(
-            STATUS_CODES.CONFLICT,
-            "User with this email already exists"
+            STATUS_CODES.BAD_REQUEST,
+            "Unable to complete registration. Please check your details or try another email."
         );
     }
 
@@ -195,13 +200,25 @@ export async function registerDoctor(email: string, password: string) {
     return user;
 }
 
-export async function verifyEmail(userId: string, token: string) {
+export async function verifyEmail(userId: string, token: string, password: string) {
     const user = await userRepository.getUserById(userId);
 
     if (!user) {
         throw new APIError(
-            STATUS_CODES.NOT_FOUND,
-            "User not found"
+            STATUS_CODES.BAD_REQUEST,
+            "Invalid verification request"
+        );
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+        password,
+        user.password_hash
+    );
+
+    if (!isPasswordValid) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Invalid verification request"
         );
     }
 
@@ -253,7 +270,7 @@ export async function verifyEmail(userId: string, token: string) {
 export async function login(email: string, password: string) {
 
     const DUMMY_PASSWORD_HASH =
-        "$2b$12$PASTE_THE_GENERATED_HASH_HERE";
+        "$2b$12$pLQCXLmgoHa48ZY5qH8hQeWFevmKdV.W9GlnZRNt6XOiGx.5XDy5y";
 
     const user = await userRepository.getUser(email);
 
@@ -264,7 +281,7 @@ export async function login(email: string, password: string) {
         passwordHash
     );
 
-    if (!user || !isPasswordValid || !user.email_verified) {
+    if (!user || !isPasswordValid || !user.email_verified || user.status !== USER_STATUS.ACTIVE) {
         throw new APIError(
             STATUS_CODES.UNAUTHORIZED,
             "Invalid email or password"
@@ -276,11 +293,27 @@ export async function login(email: string, password: string) {
         role: user.role
     }
 
-    const accessToken = generateJWTToken(tokenPayLoad);
-    const refreshToken = generateJWTToken(tokenPayLoad, "refresh");
+    const { token: accessToken } = generateJWTToken(tokenPayLoad);
+    const { token: refreshToken, jti } = generateJWTToken(tokenPayLoad, "refresh");
+
+    const redisKey = REDIS_KEYS.refreshToken(jti);
+    const redisClient = getRedisClient();
+    const REFRESH_TOKEN_EXPIRY = 7 * 24 * 60 * 60;
+
+    await retry(
+        () =>
+            redisClient.set(
+                redisKey,
+                user.id,
+                { EX: REFRESH_TOKEN_EXPIRY }
+            ),
+        3,
+        2000,
+        "Store refresh token in Redis"
+    );
 
     return {
-        role: user,
+        role: user.role,
         accessToken,
         refreshToken
     }

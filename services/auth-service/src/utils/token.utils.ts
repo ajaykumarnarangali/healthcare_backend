@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { randomUUID } from "crypto";
 
 export function generateVerificationToken() {
     return crypto.randomBytes(32).toString("hex");
@@ -14,9 +15,15 @@ export function hashVerificationToken(token: string) {
 
 type TokenType = "access" | "refresh";
 export function generateJWTToken(
-    payload: object,
+    tokenPayload: object,
     type: TokenType = "access"
 ) {
+
+    const jti = randomUUID();
+    const payload = {
+        ...tokenPayload,
+        jti,
+    };
     const secret =
         type === "access"
             ? process.env.ACCESS_TOKEN_SECRET
@@ -33,7 +40,9 @@ export function generateJWTToken(
         );
     }
 
-    return jwt.sign(payload, secret, {
-        expiresIn,
+    const token = jwt.sign(payload, secret, {
+        expiresIn
     });
+
+    return { token, jti }
 }
