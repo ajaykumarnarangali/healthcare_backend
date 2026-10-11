@@ -103,22 +103,12 @@ export async function registerPatient(email: string, password: string) {
     return user;
 }
 
-export function verifyLicenseNumber(licenseNumber: string): boolean {
-    const MOCK_LICENSE_NUMBERS = [
-        "LIC1234567",
-        "LIC2345678",
-        "LIC3456789",
-        "LIC4567890",
-        "LIC5678901",
-        "LIC6789012",
-        "LIC7890123",
-        "LIC8901234",
-        "LIC9012345",
-        "LIC0123456",
-    ];
-    return MOCK_LICENSE_NUMBERS.includes(licenseNumber);
+export async function verifyLicenseNumber(
+    email: string,
+    licenseNumber: string
+): Promise<boolean> {
+    return userRepository.doctorLicenseExists(email, licenseNumber);
 }
-
 export async function registerDoctor(email: string, password: string) {
 
     const existingUser = await userRepository.getUser(email);

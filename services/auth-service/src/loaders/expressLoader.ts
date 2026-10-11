@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 import type { Express } from "express";
 import cookieParser from "cookie-parser";
 import {
@@ -10,6 +11,8 @@ import {
 import { routerLoader } from "./routesLoader.js";
 
 export function expressLoader(app: Express) {
+
+    app.use(helmet());
     app.use(cors({
         origin: process.env.FRONT_END_URL,
         credentials: true

@@ -13,6 +13,26 @@ export async function getUser(email: string) {
     return result.rows[0];
 }
 
+export async function doctorLicenseExists(
+    email: string,
+    licenseNumber: string
+): Promise<boolean> {
+    const pool = getPool();
+
+    const result = await pool.query(
+        `SELECT EXISTS (
+            SELECT 1
+            FROM doctor_licenses
+            WHERE email = $1
+              AND license_number = $2
+              AND status = 'ACTIVE'
+        ) AS exists`,
+        [email, licenseNumber]
+    );
+
+    return result.rows[0].exists;
+}
+
 export async function createUser(
     email: string,
     passwordHash: string,
