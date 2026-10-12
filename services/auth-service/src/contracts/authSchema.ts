@@ -47,7 +47,7 @@ export const doctorRegisterBodySchema = zod.object({
         .string()
         .trim()
         .min(1, "License number is required")
-        .length(10, "License number must be exactly 10 characters")
+        .length(11, "License number must be exactly 10 characters")
 }).strict();
 
 export type DoctorRegisterBody =

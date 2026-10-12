@@ -27,7 +27,7 @@ export async function registerDoctor(req: DoctorRegisterRequest) {
     const { email, password, licenseNumber } = req.body;
 
     const licenseVerification =
-        authService.verifyLicenseNumber(email,licenseNumber);
+        await authService.verifyLicenseNumber(email, licenseNumber);
     if (!licenseVerification) {
         throw new APIError(
             STATUS_CODES.BAD_REQUEST,
