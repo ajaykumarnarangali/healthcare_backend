@@ -55,7 +55,7 @@ export async function getUserById(userId: string) {
 
     const result = await pool.query(
         `
-        SELECT id, email_verified
+        SELECT id, email_verified, password_hash
         FROM users
         WHERE id = $1
         `,
@@ -63,6 +63,23 @@ export async function getUserById(userId: string) {
     );
 
     return result.rows[0];
+}
+
+export async function getUserPermissions(role: string) {
+    const pool = getPool();
+
+    const result = await pool.query(
+        `
+        SELECT p.name
+        FROM role_permissions AS rp
+        JOIN permissions AS p
+            ON rp.permission_id = p.permission_id
+        WHERE rp.role = $1;
+        `,
+        [role]
+    );
+
+    return result.rows.map((row) => row.name);
 }
 
 export async function verifyUser(userId: string) {

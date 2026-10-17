@@ -278,6 +278,8 @@ export async function login(email: string, password: string) {
         );
     }
 
+    const permissions = await userRepository.getUserPermissions(user.role);
+
     const tokenPayLoad = {
         sub: user.id,
         role: user.role
@@ -303,8 +305,9 @@ export async function login(email: string, password: string) {
     );
 
     return {
-        role: user.role,
+        permissions,
         accessToken,
-        refreshToken
+        refreshToken,
+        role: user.role
     }
 }
