@@ -65,7 +65,7 @@ export async function verifyEmail(req: VerifyEmailRequest) {
 export async function login(req: UserLoginRequest, res: Response) {
 
     const { email, password } = req.body;
-    const { accessToken, refreshToken, role, permissions } = await authService.login(email, password);
+    const { accessToken, refreshToken, role, userId, permissions } = await authService.login(email, password);
 
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
@@ -79,9 +79,15 @@ export async function login(req: UserLoginRequest, res: Response) {
         body: {
             success: true,
             message: "Logged in successfully",
-            role,
-            accessToken,
-            permissions
+            data: {
+                userId,
+                accessToken,
+                user: {
+                    email,
+                    role
+                },
+                permissions,
+            }
         }
     }
 }

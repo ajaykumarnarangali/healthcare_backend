@@ -308,6 +308,7 @@ export async function login(email: string, password: string) {
         permissions,
         accessToken,
         refreshToken,
-        role: user.role
+        role: user.role,
+        userId: user.id
     }
 }
