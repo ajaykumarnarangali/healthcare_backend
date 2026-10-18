@@ -1,6 +1,8 @@
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
 import { randomUUID } from "crypto";
+import { APIError } from "../error/APIError.js";
+import { STATUS_CODES } from "../constants/statusCodes.js";
 
 export function generateVerificationToken() {
     return crypto.randomBytes(32).toString("hex");
@@ -53,7 +55,6 @@ export const verifyJWTToken = (token: string, type: TokenType = "access") => {
         type === "access"
             ? process.env.ACCESS_TOKEN_SECRET
             : process.env.REFRESH_TOKEN_SECRET;
-
     if (!secret) {
         throw new Error(`${type.toUpperCase()}_TOKEN_SECRET is not configured`);
     }
@@ -62,7 +63,10 @@ export const verifyJWTToken = (token: string, type: TokenType = "access") => {
         return jwt.verify(token, secret, {
             algorithms: ["HS256"]
         });
-    } catch (error) {
-        throw new Error("Invalid or expired token");
+    } catch {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Please sign in again to continue"
+        );
     }
 };

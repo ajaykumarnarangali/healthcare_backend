@@ -356,9 +356,9 @@ export async function refresh(refreshToken: string) {
         sub: user.id,
         role: user.role
     }
-    const accessToken = generateJWTToken(tokenPayLoad);
+    const { token } = generateJWTToken(tokenPayLoad);
 
     return {
-        accessToken
+        accessToken: token
     }
 }

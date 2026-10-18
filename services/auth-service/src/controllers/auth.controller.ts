@@ -126,7 +126,7 @@ export async function refresh(req: RefreshRequest) {
         status: STATUS_CODES.OK,
         body: {
             success: true,
-            message: "Logged in successfully",
+            message: "token generated successfully",
             data: { accessToken }
         }
     }
