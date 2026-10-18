@@ -41,8 +41,28 @@ export function generateJWTToken(
     }
 
     const token = jwt.sign(payload, secret, {
+        algorithm: "HS256",
         expiresIn
     });
 
     return { token, jti }
 }
+
+export const verifyJWTToken = (token: string, type: TokenType = "access") => {
+    const secret =
+        type === "access"
+            ? process.env.ACCESS_TOKEN_SECRET
+            : process.env.REFRESH_TOKEN_SECRET;
+
+    if (!secret) {
+        throw new Error(`${type.toUpperCase()}_TOKEN_SECRET is not configured`);
+    }
+
+    try {
+        return jwt.verify(token, secret, {
+            algorithms: ["HS256"]
+        });
+    } catch (error) {
+        throw new Error("Invalid or expired token");
+    }
+};

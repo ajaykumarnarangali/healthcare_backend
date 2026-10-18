@@ -2,7 +2,6 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
-import { generateJWTToken } from "../utils/token.utils.js";
 import * as userRepository from "../repositories/user.repository.js";
 import { getRabbitMQChannel, getRedisClient } from "../loaders/init.js";
 import { USER_STATUS } from "../constants/user.constants.js";
@@ -15,6 +14,8 @@ import {
     USER_EMAIL_VERIFICATION_REQUESTED,
 } from "../constants/index.js";
 import {
+    verifyJWTToken,
+    generateJWTToken,
     hashVerificationToken,
     generateVerificationToken
 } from "../utils/token.utils.js";
@@ -109,6 +110,7 @@ export async function verifyLicenseNumber(
 ): Promise<boolean> {
     return userRepository.doctorLicenseExists(email, licenseNumber);
 }
+
 export async function registerDoctor(email: string, password: string) {
 
     const existingUser = await userRepository.getUser(email);
@@ -310,5 +312,53 @@ export async function login(email: string, password: string) {
         refreshToken,
         role: user.role,
         userId: user.id
+    }
+}
+
+export async function refresh(refreshToken: string) {
+
+    const decoded = verifyJWTToken(refreshToken, "refresh");
+
+    if (typeof decoded === "string" || !decoded.jti || !decoded.sub) {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Invalid refresh token payload"
+        );
+    }
+
+    const redisKey = REDIS_KEYS.refreshToken(decoded.jti);
+    const redisClient = getRedisClient();
+
+    const userId = await retry(
+        () => redisClient.get(redisKey),
+        3,
+        2000,
+        "Retrieve refresh token from Redis"
+    );
+
+    if (!userId || userId !== decoded.sub) {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Please sign in again to continue"
+        );
+    }
+
+    const user = await userRepository.getUserById(userId);
+
+    if (!user || user.status !== "ACTIVE") {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Please sign in again to continue"
+        );
+    }
+
+    const tokenPayLoad = {
+        sub: user.id,
+        role: user.role
+    }
+    const accessToken = generateJWTToken(tokenPayLoad);
+
+    return {
+        accessToken
     }
 }

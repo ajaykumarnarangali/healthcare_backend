@@ -41,4 +41,13 @@ export const authContract = c.router({
             200: authSchema.loginResponseSchema
         },
     },
+
+    refresh: {
+        method: "POST",
+        path: `${BASIC_ENDPOINT}/refresh`,
+        body: c.type<undefined>(),
+        responses: {
+            200: authSchema.refreshResponseSchema,
+        },
+    },
 });

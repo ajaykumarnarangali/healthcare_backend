@@ -27,4 +27,8 @@ export const authRoutes = s.router(authContract, {
         middleware: [rateLimiter(rateLimitConfig.login)],
         handler: async (r) => callControllerWithResponse(authController.login)(r),
     },
+    refresh: {
+        middleware: [rateLimiter(rateLimitConfig.refreshToken)],
+        handler: async (r) => callController(authController.refresh)(r),
+    }
 });

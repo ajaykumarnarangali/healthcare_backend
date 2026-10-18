@@ -42,3 +42,9 @@ export type UserLoginRequest = AppRequest<
     UserLoginBody,
     undefined
 >;
+
+export type RefreshRequest = AppRequest<
+    undefined,
+    undefined,
+    undefined
+>;

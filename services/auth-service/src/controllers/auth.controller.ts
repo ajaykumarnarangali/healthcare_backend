@@ -6,7 +6,8 @@ import type {
     PatientRegisterRequest,
     DoctorRegisterRequest,
     VerifyEmailRequest,
-    UserLoginRequest
+    UserLoginRequest,
+    RefreshRequest
 } from "../contracts/types.js";
 
 export async function registerPatient(req: PatientRegisterRequest) {
@@ -92,3 +93,41 @@ export async function login(req: UserLoginRequest, res: Response) {
     }
 }
 
+export async function refresh(req: RefreshRequest) {
+
+    const allowedOrigin = process.env.FRONT_END_URL;
+
+    if (req.raw.headers.origin !== allowedOrigin) {
+        throw new APIError(
+            STATUS_CODES.FORBIDDEN,
+            "Request could not be verified."
+        );
+    }
+
+    const body = req.body;
+    if (body && Object.keys(body).length > 0) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "This endpoint does not accept a request body."
+        );
+    }
+
+    const refreshToken = req.raw.cookies?.refreshToken;
+    if (!refreshToken) {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Session expired or invalid. Please log in again."
+        );
+    }
+
+    const { accessToken } = await authService.refresh(refreshToken);
+
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Logged in successfully",
+            data: { accessToken }
+        }
+    }
+}

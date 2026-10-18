@@ -116,3 +116,11 @@ export const loginResponseSchema = zod.object({
 
 export type UserLoginBody =
     zod.infer<typeof loginBodySchema>;
+
+export const refreshResponseSchema = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+    data: zod.object({
+        accessToken: zod.string(),
+    }),
+});
