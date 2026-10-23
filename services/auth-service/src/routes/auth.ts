@@ -33,7 +33,10 @@ export const authRoutes = s.router(authContract, {
         handler: async (r) => callController(authController.refresh)(r),
     },
     getMe: {
-        middleware: [rateLimiter(rateLimitConfig.getMe), authenticate],
+        middleware: [
+            authenticate,
+            rateLimiter(rateLimitConfig.getMe)
+        ],
         handler: async (r) => callController(authController.getMe)(r),
     }
 });

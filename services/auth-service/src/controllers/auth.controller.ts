@@ -138,7 +138,7 @@ export async function getMe(req: getMeRequest) {
         status: STATUS_CODES.OK,
         body: {
             success: true,
-            message: "Logged in successfully",
+            message: "user summary fetched successfully",
             data: {
                 user: user_info,
                 permissions,

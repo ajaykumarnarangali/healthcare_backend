@@ -55,7 +55,7 @@ export async function getUserById(userId: string) {
 
     const result = await pool.query(
         `
-        SELECT id,status, email_verified, password_hash
+        SELECT id,status,email,role,email_verified,password_hash
         FROM users
         WHERE id = $1
         `,
