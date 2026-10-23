@@ -5,7 +5,7 @@ import type {
     verifyEmailQuery,
     vefifyEmailBody,
     UserLoginBody
-} from "./authSchema.js";
+} from "./schema.js";
 
 type AuthenticatedUser = {
     userId: string;

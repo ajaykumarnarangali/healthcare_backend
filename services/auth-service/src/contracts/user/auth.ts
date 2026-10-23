@@ -1,5 +1,5 @@
 import { initContract } from "@ts-rest/core";
-import * as authSchema from "./authSchema.js";
+import * as authSchema from "./schema.js";
 
 const c = initContract();
 const BASIC_ENDPOINT = "/api/auth" as const;

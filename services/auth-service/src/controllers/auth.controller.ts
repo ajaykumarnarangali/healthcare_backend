@@ -9,7 +9,7 @@ import type {
     UserLoginRequest,
     RefreshRequest,
     getMeRequest
-} from "../contracts/types.js";
+} from "../contracts/user/types.js";
 
 export async function registerPatient(req: PatientRegisterRequest) {
     const { email, password } = req.body;
