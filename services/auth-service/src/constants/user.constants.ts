@@ -5,6 +5,15 @@ export const USER_ROLES = {
     GLOBAL_ADMIN: "GLOBAL_ADMIN",
 } as const;
 
+export const ALLOWED_ROLES = ["PATIENT", "DOCTOR", "HOSPITAL_ADMIN", "GLOBAL_ADMIN"];
+
+export type UserRole =
+    | "PATIENT"
+    | "DOCTOR"
+    | "HOSPITAL_ADMIN"
+    | "GLOBAL_ADMIN";
+
+
 export const USER_STATUS = {
     PENDING: "PENDING",
     ACTIVE: "ACTIVE",

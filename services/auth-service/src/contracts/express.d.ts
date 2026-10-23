@@ -1,8 +1,10 @@
+import { type UserRole } from "../constants/user.constants.ts";
+
 declare global {
     namespace Express {
         interface User {
             userId: string;
-            role: string;
+            role: UserRole;
         }
 
         interface Request {

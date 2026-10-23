@@ -50,4 +50,12 @@ export const authContract = c.router({
             200: authSchema.refreshResponseSchema,
         },
     },
+
+    getMe: {
+        method: "GET",
+        path: `${BASIC_ENDPOINT}/me`,
+        responses: {
+            200: authSchema.getMeResonseSchema,
+        },
+    },
 });

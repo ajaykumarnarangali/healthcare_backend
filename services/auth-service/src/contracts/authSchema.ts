@@ -110,8 +110,17 @@ export const loginBodySchema = zod.object({
 export const loginResponseSchema = zod.object({
     success: zod.boolean(),
     message: zod.string(),
-    accessToken: zod.string(),
-    role: zod.string()
+    data: zod.object({
+        userId: zod.string(),
+        accessToken: zod.string(),
+        user: zod.object({
+            email: zod.string().email(),
+            role: zod.string(),
+            name: zod.string().nullable(),
+            profile_photo: zod.string().nullable()
+        }),
+        permissions: zod.array(zod.string()),
+    }),
 });
 
 export type UserLoginBody =
@@ -122,5 +131,19 @@ export const refreshResponseSchema = zod.object({
     message: zod.string(),
     data: zod.object({
         accessToken: zod.string(),
+    }),
+});
+
+export const getMeResonseSchema = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+    data: zod.object({
+        user: zod.object({
+            email: zod.string().email(),
+            role: zod.string(),
+            name: zod.string().nullable(),
+            profile_photo: zod.string().nullable()
+        }),
+        permissions: zod.array(zod.string()),
     }),
 });

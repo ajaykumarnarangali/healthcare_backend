@@ -65,6 +65,25 @@ export async function getUserById(userId: string) {
     return result.rows[0];
 }
 
+export async function getUserSummary(userId: string) {
+    const pool = getPool();
+
+    const result = await pool.query(
+        `
+        SELECT
+            up.first_name,
+            up.profile_photo
+        FROM users u
+        LEFT JOIN user_profiles up
+            ON u.id = up.user_id
+        WHERE u.id = $1
+        `,
+        [userId]
+    );
+
+    return result.rows[0];
+}
+
 export async function getUserPermissions(role: string) {
     const pool = getPool();
 

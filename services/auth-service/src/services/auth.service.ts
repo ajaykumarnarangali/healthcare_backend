@@ -4,7 +4,7 @@ import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
 import * as userRepository from "../repositories/user.repository.js";
 import { getRabbitMQChannel, getRedisClient } from "../loaders/init.js";
-import { USER_STATUS } from "../constants/user.constants.js";
+import { USER_STATUS, type UserRole } from "../constants/user.constants.js";
 import { logger } from "../utils/logger.js";
 import {
     USER_ROLES,
@@ -281,6 +281,7 @@ export async function login(email: string, password: string) {
     }
 
     const permissions = await userRepository.getUserPermissions(user.role);
+    const userSummary = await userRepository.getUserSummary(user.id);
 
     const tokenPayLoad = {
         sub: user.id,
@@ -310,8 +311,12 @@ export async function login(email: string, password: string) {
         permissions,
         accessToken,
         refreshToken,
-        role: user.role,
-        userId: user.id
+        userId: user.id,
+        user_info: {
+            role: user.role,
+            name: userSummary?.first_name ?? null,
+            profile_photo: userSummary?.profile_photo ?? null
+        }
     }
 }
 
@@ -354,8 +359,9 @@ export async function refresh(refreshToken: string) {
 
     const tokenPayLoad = {
         sub: user.id,
-        role: user.role
-    }
+        role: user.role as UserRole,
+    };
+
     const { token } = generateJWTToken(tokenPayLoad);
 
     return {

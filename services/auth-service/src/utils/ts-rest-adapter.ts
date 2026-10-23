@@ -4,7 +4,7 @@ export function callController(controller: Function) {
             query: r.req.query,
             body: r.body,
             params: r.req.params,
-            // ctx: r.ctx,
+            user: r.req.user,
             raw: r.req,
         };
 
@@ -18,8 +18,8 @@ export function callControllerWithResponse(controller: Function) {
             query: r.req.query,
             body: r.body,
             params: r.req.params,
-            // ctx: r.ctx,
-            raw: r.req,
+            user: r.req.user,
+            raw: r.req
         };
 
         return controller(request, r.res);
