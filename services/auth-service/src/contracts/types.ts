@@ -7,6 +7,11 @@ import type {
     UserLoginBody
 } from "./authSchema.js";
 
+type AuthenticatedUser = {
+    userId: string;
+    role: string;
+};
+
 type AppRequest<
     TQuery = undefined,
     TBody = undefined,
@@ -15,6 +20,7 @@ type AppRequest<
     query: Readonly<TQuery>;
     body: Readonly<TBody>;
     params: Readonly<TParams>;
+    user?: Readonly<AuthenticatedUser>;
     raw: Readonly<ExpressRequest>;
 };
 
@@ -44,6 +50,12 @@ export type UserLoginRequest = AppRequest<
 >;
 
 export type RefreshRequest = AppRequest<
+    undefined,
+    undefined,
+    undefined
+>;
+
+export type getMeRequest = AppRequest<
     undefined,
     undefined,
     undefined

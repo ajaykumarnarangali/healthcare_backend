@@ -8,7 +8,8 @@ import {
 } from "../utils/ts-rest-adapter.js";
 import {
     rateLimiter,
-    rateLimitConfig
+    authenticate,
+    rateLimitConfig,
 } from "../middlewares/index.js";
 
 const s = initServer();
@@ -30,5 +31,9 @@ export const authRoutes = s.router(authContract, {
     refresh: {
         middleware: [rateLimiter(rateLimitConfig.refreshToken)],
         handler: async (r) => callController(authController.refresh)(r),
+    },
+    getMe: {
+        middleware: [rateLimiter(rateLimitConfig.getMe), authenticate],
+        handler: async (r) => callController(authController.getMe)(r),
     }
 });

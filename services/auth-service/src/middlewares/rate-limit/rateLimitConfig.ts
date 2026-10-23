@@ -5,7 +5,8 @@ export type RateLimitEndpoint =
     | "doctorRegister"
     | "login"
     | "verifyEmail"
-    | "refreshToken";
+    | "refreshToken"
+    | "getMe";
 
 export type RateLimitConfig = {
     name: string,
@@ -48,4 +49,11 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
         limit: 10,
         keyTypes: ["ip"],
     },
+
+    getMe: {
+        name: "auth:me",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 10,
+        keyTypes: ["ip", "userId"],
+    }
 } as const;

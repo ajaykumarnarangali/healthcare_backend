@@ -7,7 +7,8 @@ import type {
     DoctorRegisterRequest,
     VerifyEmailRequest,
     UserLoginRequest,
-    RefreshRequest
+    RefreshRequest,
+    getMeRequest
 } from "../contracts/types.js";
 
 export async function registerPatient(req: PatientRegisterRequest) {
@@ -83,7 +84,7 @@ export async function login(req: UserLoginRequest, res: Response) {
             data: {
                 userId,
                 accessToken,
-                user: { ...user_info, email },
+                user: user_info,
                 permissions,
             }
         }
@@ -125,6 +126,23 @@ export async function refresh(req: RefreshRequest) {
             success: true,
             message: "token generated successfully",
             data: { accessToken }
+        }
+    }
+}
+
+export async function getMe(req: getMeRequest) {
+
+    const { userId } = req.user!;
+    const { user_info, permissions } = await authService.getMe(userId);
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Logged in successfully",
+            data: {
+                user: user_info,
+                permissions,
+            }
         }
     }
 }

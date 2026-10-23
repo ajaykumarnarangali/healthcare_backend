@@ -313,6 +313,7 @@ export async function login(email: string, password: string) {
         refreshToken,
         userId: user.id,
         user_info: {
+            email: user.email,
             role: user.role,
             name: userSummary?.first_name ?? null,
             profile_photo: userSummary?.profile_photo ?? null
@@ -366,5 +367,29 @@ export async function refresh(refreshToken: string) {
 
     return {
         accessToken: token
+    }
+}
+
+export async function getMe(userId: string) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user || user.status !== USER_STATUS.ACTIVE) {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "User not found or session is invalid"
+        );
+    }
+
+    const userSummary = await userRepository.getUserSummary(user.id);
+    const permissions = await userRepository.getUserPermissions(user.role);
+
+    return {
+        permissions,
+        user_info: {
+            email: user.email,
+            role: user.role,
+            name: userSummary?.first_name ?? null,
+            profile_photo: userSummary?.profile_photo ?? null
+        }
     }
 }
