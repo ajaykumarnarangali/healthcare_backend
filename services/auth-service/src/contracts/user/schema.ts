@@ -147,3 +147,9 @@ export const getMeResonseSchema = zod.object({
         permissions: zod.array(zod.string()),
     }),
 });
+
+
+export const signOutResponseSchema = zod.object({
+    success: zod.boolean(),
+    message: zod.string()
+});

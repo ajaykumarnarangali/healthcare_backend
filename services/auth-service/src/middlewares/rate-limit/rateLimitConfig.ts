@@ -6,7 +6,8 @@ export type RateLimitEndpoint =
     | "login"
     | "verifyEmail"
     | "refreshToken"
-    | "getMe";
+    | "getMe"
+    | "signOut";
 
 export type RateLimitConfig = {
     name: string,
@@ -52,6 +53,13 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
 
     getMe: {
         name: "auth:me",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 10,
+        keyTypes: ["ip", "userId"],
+    },
+
+    signOut: {
+        name: "auth:signout",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
         keyTypes: ["ip", "userId"],

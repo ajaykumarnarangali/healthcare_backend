@@ -7,8 +7,7 @@ import type {
     DoctorRegisterRequest,
     VerifyEmailRequest,
     UserLoginRequest,
-    RefreshRequest,
-    getMeRequest
+    emptyRequest
 } from "../contracts/user/types.js";
 
 export async function registerPatient(req: PatientRegisterRequest) {
@@ -91,11 +90,16 @@ export async function login(req: UserLoginRequest, res: Response) {
     }
 }
 
-export async function refresh(req: RefreshRequest) {
+export async function refresh(req: emptyRequest) {
 
-    const allowedOrigin = process.env.FRONT_END_URL;
+    const allowedOrigins = [
+        process.env.USER_FRONTEND_URL,
+        process.env.ADMIN_FRONTEND_URL,
+    ];
 
-    if (req.raw.headers.origin !== allowedOrigin) {
+    const origin = req.raw.headers.origin;
+
+    if (!origin || !allowedOrigins.includes(origin)) {
         throw new APIError(
             STATUS_CODES.FORBIDDEN,
             "Request could not be verified."
@@ -130,7 +134,7 @@ export async function refresh(req: RefreshRequest) {
     }
 }
 
-export async function getMe(req: getMeRequest) {
+export async function getMe(req: emptyRequest) {
 
     const { userId } = req.user!;
     const { user_info, permissions } = await authService.getMe(userId);
@@ -143,6 +147,48 @@ export async function getMe(req: getMeRequest) {
                 user: user_info,
                 permissions,
             }
+        }
+    }
+}
+
+export async function signout(req: emptyRequest, res: Response) {
+    const body = req.body;
+    if (body && Object.keys(body).length > 0) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "This endpoint does not accept a request body."
+        );
+    }
+
+    const refreshToken = req.raw.cookies?.refreshToken;
+
+    if (refreshToken) {
+        try {
+            await authService.signout(refreshToken);
+        } catch (error) {
+            if (
+                !(
+                    error instanceof APIError &&
+                    error.status === STATUS_CODES.UNAUTHORIZED
+                )
+            ) {
+                throw error;
+            }
+        }
+    }
+
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+    });
+
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "user summary fetched successfully"
         }
     }
 }

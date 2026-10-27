@@ -29,14 +29,21 @@ export const authRoutes = s.router(authContract, {
         handler: async (r) => callControllerWithResponse(authController.login)(r),
     },
     refresh: {
-        middleware: [rateLimiter(rateLimitConfig.refreshToken)],
+        // middleware: [rateLimiter(rateLimitConfig.refreshToken)],
         handler: async (r) => callController(authController.refresh)(r),
     },
     getMe: {
         middleware: [
             authenticate,
-            rateLimiter(rateLimitConfig.getMe)
+            // rateLimiter(rateLimitConfig.getMe)
         ],
         handler: async (r) => callController(authController.getMe)(r),
+    },
+    signOut: {
+        middleware: [
+            authenticate,
+            rateLimiter(rateLimitConfig.signOut)
+        ],
+        handler: async (r) => callControllerWithResponse(authController.signout)(r),
     }
 });

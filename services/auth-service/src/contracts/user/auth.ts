@@ -58,4 +58,13 @@ export const authContract = c.router({
             200: authSchema.getMeResonseSchema,
         },
     },
+
+    signOut: {
+        method: "POST",
+        path: `${BASIC_ENDPOINT}/signout`,
+        body: c.type<undefined>(),
+        responses: {
+            200: authSchema.signOutResponseSchema,
+        },
+    },
 });

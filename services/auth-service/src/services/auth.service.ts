@@ -386,10 +386,32 @@ export async function getMe(userId: string) {
     return {
         permissions,
         user_info: {
+            userId: user.id,
             email: user.email,
             role: user.role,
             name: userSummary?.first_name ?? null,
             profile_photo: userSummary?.profile_photo ?? null
         }
     }
+}
+
+export async function signout(token: string) {
+    const decoded = verifyJWTToken(token, "refresh");
+
+    if (typeof decoded === "string" || !decoded.jti || !decoded.sub) {
+        throw new APIError(
+            STATUS_CODES.UNAUTHORIZED,
+            "Invalid refresh token payload"
+        );
+    }
+
+    const redisKey = REDIS_KEYS.refreshToken(decoded.jti);
+    const redisClient = getRedisClient();
+
+    await retry(
+        () => redisClient.del(redisKey),
+        3,
+        2000,
+        "Delete refresh token from Redis"
+    );
 }

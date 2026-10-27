@@ -49,13 +49,7 @@ export type UserLoginRequest = AppRequest<
     undefined
 >;
 
-export type RefreshRequest = AppRequest<
-    undefined,
-    undefined,
-    undefined
->;
-
-export type getMeRequest = AppRequest<
+export type emptyRequest = AppRequest<
     undefined,
     undefined,
     undefined
