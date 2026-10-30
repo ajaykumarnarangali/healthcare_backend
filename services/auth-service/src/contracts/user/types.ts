@@ -1,11 +1,5 @@
 import type { Request as ExpressRequest } from "express";
-import type {
-    PatientRegisterBody,
-    DoctorRegisterBody,
-    verifyEmailQuery,
-    vefifyEmailBody,
-    UserLoginBody
-} from "./schema.js";
+import type { createPatientProfileBody } from "../user/schema.js";
 
 type AuthenticatedUser = {
     userId: string;
@@ -16,41 +10,19 @@ type AppRequest<
     TQuery = undefined,
     TBody = undefined,
     TParams = undefined,
+    TFile = undefined,
 > = {
     query: Readonly<TQuery>;
     body: Readonly<TBody>;
     params: Readonly<TParams>;
     user?: Readonly<AuthenticatedUser>;
+    file?: TFile;
     raw: Readonly<ExpressRequest>;
 };
 
-
-export type PatientRegisterRequest = AppRequest<
+export type createProfileRequest = AppRequest<
     undefined,
-    PatientRegisterBody,
-    undefined
->;
-
-export type DoctorRegisterRequest = AppRequest<
+    createPatientProfileBody,
     undefined,
-    DoctorRegisterBody,
-    undefined
->;
-
-export type VerifyEmailRequest = AppRequest<
-    verifyEmailQuery,
-    vefifyEmailBody,
-    undefined
->;
-
-export type UserLoginRequest = AppRequest<
-    undefined,
-    UserLoginBody,
-    undefined
->;
-
-export type emptyRequest = AppRequest<
-    undefined,
-    undefined,
-    undefined
+    Express.Multer.File
 >;

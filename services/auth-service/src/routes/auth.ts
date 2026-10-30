@@ -1,5 +1,5 @@
 import { initServer } from "@ts-rest/express";
-import { authContract } from "../contracts/user/auth.js";
+import { authContract } from "../contracts/auth/auth.js";
 import * as authController from "../controllers/auth.controller.js";
 import type { Response } from "express";
 import {

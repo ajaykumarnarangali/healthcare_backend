@@ -9,9 +9,17 @@ CREATE TABLE user_profiles (
     phone VARCHAR(20) NOT NULL,
     date_of_birth DATE NOT NULL,
     gender VARCHAR(20) NOT NULL,
+
     profile_photo TEXT,
-    address TEXT,
-    profile_completed BOOLEAN NOT NULL DEFAULT FALSE,
+    profile_photo_public_id TEXT,
+
+    street_address TEXT,
+    city VARCHAR(100),
+    state VARCHAR(100),
+    country VARCHAR(100),
+    postal_code VARCHAR(20),
+
+    profile_completed BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

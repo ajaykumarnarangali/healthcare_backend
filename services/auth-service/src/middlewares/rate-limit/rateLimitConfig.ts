@@ -7,7 +7,8 @@ export type RateLimitEndpoint =
     | "verifyEmail"
     | "refreshToken"
     | "getMe"
-    | "signOut";
+    | "signOut"
+    | "createProfile";
 
 export type RateLimitConfig = {
     name: string,
@@ -16,6 +17,7 @@ export type RateLimitConfig = {
     keyTypes: Array<"ip" | "email" | "userId">;
 };
 export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
+    //auth routes
     patientRegister: {
         name: "auth:patient-reg",
         windowMs: FIFTEEN_MINUTES,
@@ -60,6 +62,14 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
 
     signOut: {
         name: "auth:signout",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 10,
+        keyTypes: ["ip", "userId"],
+    },
+
+    // user routes
+    createProfile: {
+        name: "create:profile",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
         keyTypes: ["ip", "userId"],

@@ -8,7 +8,7 @@ import type {
     VerifyEmailRequest,
     UserLoginRequest,
     emptyRequest
-} from "../contracts/user/types.js";
+} from "../contracts/auth/types.js";
 
 export async function registerPatient(req: PatientRegisterRequest) {
     const { email, password } = req.body;
