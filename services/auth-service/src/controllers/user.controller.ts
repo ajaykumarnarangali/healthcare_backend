@@ -23,7 +23,7 @@ export async function createProfile(req: createProfileRequest) {
         status: 201,
         body: {
             success: true,
-            message: "Profile statistics retrieved successfully",
+            message: "Profile statistics created successfully",
             data: {
                 profile
             }

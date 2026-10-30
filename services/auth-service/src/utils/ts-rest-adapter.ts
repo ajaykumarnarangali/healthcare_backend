@@ -6,6 +6,7 @@ export function callController(controller: Function) {
             params: r.req.params,
             user: r.req.user,
             raw: r.req,
+            file: r.req.file
         };
 
         return controller(request);
@@ -19,7 +20,8 @@ export function callControllerWithResponse(controller: Function) {
             body: r.body,
             params: r.req.params,
             user: r.req.user,
-            raw: r.req
+            raw: r.req,
+            file: r.req.file
         };
 
         return controller(request, r.res);

@@ -38,7 +38,6 @@ export const uploadSingleFile = (fieldName: string) => {
         upload(req, res, async (error) => {
             try {
                 if (error) {
-                    console.log("multer error ", error)
                     return next(new APIError(
                         STATUS_CODES.BAD_REQUEST,
                         'Unable to process the uploaded image'
