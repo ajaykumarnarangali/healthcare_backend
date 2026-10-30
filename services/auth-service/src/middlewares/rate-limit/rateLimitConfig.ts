@@ -8,7 +8,8 @@ export type RateLimitEndpoint =
     | "refreshToken"
     | "getMe"
     | "signOut"
-    | "createProfile";
+    | "createProfile"
+    | "getProfile";
 
 export type RateLimitConfig = {
     name: string,
@@ -70,6 +71,13 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
     // user routes
     createProfile: {
         name: "create:profile",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 10,
+        keyTypes: ["ip", "userId"],
+    },
+
+    getProfile: {
+        name: "get:profile",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
         keyTypes: ["ip", "userId"],

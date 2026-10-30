@@ -26,3 +26,9 @@ export type createProfileRequest = AppRequest<
     undefined,
     Express.Multer.File
 >;
+
+export type emptyRequest = AppRequest<
+    undefined,
+    undefined,
+    undefined
+>;

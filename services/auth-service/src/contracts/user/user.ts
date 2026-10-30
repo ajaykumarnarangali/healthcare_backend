@@ -5,7 +5,7 @@ const c = initContract();
 const BASIC_ENDPOINT = "/api/user" as const;
 
 export const userContract = c.router({
-    createPatientProfile: {
+    createUserProfile: {
         method: 'POST',
         path: `${BASIC_ENDPOINT}/profile`,
         body: userSchema.createPatientProfileSchema,
@@ -13,4 +13,13 @@ export const userContract = c.router({
             201: userSchema.createProfileResponseSchema
         }
     },
+
+    getUserProfile: {
+        method: 'GET',
+        path: `${BASIC_ENDPOINT}/profile`,
+        responses: {
+            201: userSchema.getProfileResponseSchema
+        }
+    }
+
 })

@@ -50,7 +50,7 @@ export const createPatientProfileSchema = z.object({
         .optional(),
 }).strict();
 
-export const createProfileResponseSchema = z.object({
+const profileResponseSchema = z.object({
     success: z.boolean(),
     message: z.string(),
     data: z.object({
@@ -69,6 +69,9 @@ export const createProfileResponseSchema = z.object({
         profileCompleted: z.boolean(),
     })
 })
+
+export const createProfileResponseSchema = profileResponseSchema
+export const getProfileResponseSchema = profileResponseSchema;
 
 export type createPatientProfileBody =
     z.infer<typeof createPatientProfileSchema>;

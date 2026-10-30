@@ -76,3 +76,25 @@ export async function createProfile(
         throw error;
     }
 }
+
+export async function getProfile(userId: string) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user || user.status !== USER_STATUS.ACTIVE) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'User not found or inactive'
+        );
+    }
+
+    const profile = await userRepository.getProfileByUserId(userId);
+
+    if (!profile || !profile.firstName) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'Profile has not been created yet'
+        );
+    }
+
+    return profile;
+}
