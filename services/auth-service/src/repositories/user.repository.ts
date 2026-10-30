@@ -124,28 +124,28 @@ export async function getProfileByUserId(userId: string) {
     const result = await pool.query(
         `
         SELECT
-            u.id AS user_id,
-            u.email,
-            up.first_name,
-            up.last_name,
+            u.id AS "userId",
+            up.first_name AS "firstName",
+            up.last_name AS "lastName",
             up.phone,
-            up.date_of_birth,
+            up.date_of_birth AS "dateOfBirth",
             up.gender,
-            up.profile_photo,
-            up.street_address,
+            up.profile_photo AS "profilePhoto",
+            up.street_address AS "streetAddress",
             up.city,
             up.state,
             up.country,
-            up.postal_code,
+            up.postal_code AS "postalCode",
+            up.profile_completed AS "profileCompleted"
         FROM users u
         LEFT JOIN user_profiles up
             ON u.id = up.user_id
-        WHERE u.id = $1
+        WHERE u.id = $1;
         `,
         [userId]
     );
 
-    return result.rows[0];
+    return result.rows[0] ?? null;
 }
 
 export async function isProfileExists(userId: string): Promise<boolean> {

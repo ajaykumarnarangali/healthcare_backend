@@ -47,7 +47,7 @@ export async function getProfile(req: emptyRequest) {
         status: STATUS_CODES.OK,
         body: {
             success: true,
-            message: "Profile statistics created successfully",
+            message: "Profile statistics fetched successfully",
             data: {
                 profile
             }
