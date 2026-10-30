@@ -1,5 +1,5 @@
 import type { Request as ExpressRequest } from "express";
-import type { createPatientProfileBody } from "../user/schema.js";
+import type { createPatientProfileBody, updatePatientProfileBody } from "../user/schema.js";
 
 type AuthenticatedUser = {
     userId: string;
@@ -26,6 +26,13 @@ export type createProfileRequest = AppRequest<
     undefined,
     Express.Multer.File
 >;
+
+export type updateProfileRequest = AppRequest<
+    undefined,
+    updatePatientProfileBody,
+    undefined,
+    Express.Multer.File
+>
 
 export type emptyRequest = AppRequest<
     undefined,

@@ -50,25 +50,27 @@ export const createPatientProfileSchema = z.object({
         .optional(),
 }).strict();
 
-const profileResponseSchema = z.object({
+export const profileResponseSchema = z.object({
     success: z.boolean(),
     message: z.string(),
     data: z.object({
-        userId: z.string().uuid(),
-        firstName: z.string(),
-        lastName: z.string().nullable(),
-        phone: z.string(),
-        dateOfBirth: z.string(),
-        gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
-        profilePhoto: z.string().nullable(),
-        streetAddress: z.string().nullable(),
-        city: z.string().nullable(),
-        state: z.string().nullable(),
-        country: z.string().nullable(),
-        postalCode: z.string().nullable(),
-        profileCompleted: z.boolean(),
-    })
-})
+        profile: z.object({
+            userId: z.string().uuid(),
+            firstName: z.string(),
+            lastName: z.string().nullable(),
+            phone: z.string(),
+            dateOfBirth: z.string(),
+            gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
+            profilePhoto: z.string().nullable(),
+            streetAddress: z.string().nullable(),
+            city: z.string().nullable(),
+            state: z.string().nullable(),
+            country: z.string().nullable(),
+            postalCode: z.string().nullable(),
+            profileCompleted: z.boolean(),
+        }),
+    }),
+});
 
 export const createProfileResponseSchema = profileResponseSchema
 export const getProfileResponseSchema = profileResponseSchema;
@@ -78,6 +80,8 @@ export type createPatientProfileBody =
 
 export const updatePatientProfileSchema =
     createPatientProfileSchema.partial().strict();
+
+export const updatePatientProfileResponseSchema = profileResponseSchema
 
 export type updatePatientProfileBody =
     z.infer<typeof updatePatientProfileSchema>;

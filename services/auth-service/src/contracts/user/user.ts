@@ -14,6 +14,15 @@ export const userContract = c.router({
         }
     },
 
+    updateUserProfile: {
+        method: 'PATCH',
+        path: `${BASIC_ENDPOINT}/profile`,
+        body: userSchema.updatePatientProfileSchema,
+        responses: {
+            201: userSchema.createProfileResponseSchema
+        }
+    },
+
     getUserProfile: {
         method: 'GET',
         path: `${BASIC_ENDPOINT}/profile`,
@@ -21,5 +30,4 @@ export const userContract = c.router({
             201: userSchema.getProfileResponseSchema
         }
     }
-
 })

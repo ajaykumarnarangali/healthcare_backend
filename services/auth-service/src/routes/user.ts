@@ -24,6 +24,14 @@ export const userRoutes = s.router(userContract, {
         ],
         handler: async (r) => callController(userController.createProfile)(r),
     },
+    updateUserProfile: {
+        middleware: [
+            authenticate,
+            // rateLimiter(rateLimitConfig.updateProfile),
+            uploadSingleFile("profilePhoto")
+        ],
+        handler: async (r) => callController(userController.updateProfile)(r),
+    },
     getUserProfile: {
         middleware: [
             authenticate,

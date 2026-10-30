@@ -9,7 +9,8 @@ export type RateLimitEndpoint =
     | "getMe"
     | "signOut"
     | "createProfile"
-    | "getProfile";
+    | "getProfile"
+    | "updateProfile";
 
 export type RateLimitConfig = {
     name: string,
@@ -23,49 +24,49 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
         name: "auth:patient-reg",
         windowMs: FIFTEEN_MINUTES,
         limit: 5,
-        keyTypes: ["ip"],
+        keyTypes: ["ip"]
     },
 
     doctorRegister: {
         name: "auth:doctor-reg",
         windowMs: FIFTEEN_MINUTES,
         limit: 5,
-        keyTypes: ["ip"],
+        keyTypes: ["ip"]
     },
 
     login: {
         name: "auth:login",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip", "email"],
+        keyTypes: ["ip", "email"]
     },
 
     verifyEmail: {
         name: "auth:verify-email",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip", "userId"],
+        keyTypes: ["ip", "userId"]
     },
 
     refreshToken: {
         name: "auth:refresh",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip"],
+        keyTypes: ["ip"]
     },
 
     getMe: {
         name: "auth:me",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip", "userId"],
+        keyTypes: ["ip", "userId"]
     },
 
     signOut: {
         name: "auth:signout",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip", "userId"],
+        keyTypes: ["ip", "userId"]
     },
 
     // user routes
@@ -73,13 +74,20 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
         name: "create:profile",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip", "userId"],
+        keyTypes: ["ip", "userId"]
+    },
+
+    updateProfile: {
+        name: "update:profile",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 10,
+        keyTypes: ["ip", "userId"]
     },
 
     getProfile: {
         name: "get:profile",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
-        keyTypes: ["ip", "userId"],
+        keyTypes: ["ip", "userId"]
     }
 } as const;

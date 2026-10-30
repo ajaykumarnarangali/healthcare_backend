@@ -1,5 +1,5 @@
 import * as userRepository from "../repositories/user.repository.js";
-import { type createPatientProfileBody } from "../contracts/user/schema.js";
+import { type createPatientProfileBody, type updatePatientProfileBody } from "../contracts/user/schema.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
 import { STATUS_CODES, USER_STATUS } from "../constants/index.js";
@@ -75,6 +75,99 @@ export async function createProfile(
 
         throw error;
     }
+}
+
+type UpdateProfileData = updatePatientProfileBody & {
+    profile_photo?: string;
+    profile_photo_public_id?: string;
+};
+export async function updateProfile(
+    userId: string,
+    profileData: updatePatientProfileBody,
+    file?: Express.Multer.File
+) {
+
+    const user = await userRepository.getUserById(userId);
+
+    if (!user || user.status !== USER_STATUS.ACTIVE) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'User not found or inactive'
+        );
+    }
+
+    const profile = await userRepository.getProfileByUserId(userId);
+
+    if (!profile || !profile.firstName) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'Profile has not been created yet'
+        );
+    }
+
+    let updateProfileData: UpdateProfileData = { ...profileData };
+
+    let uploadedPublicId: string | null = null;
+    let oldImagePublicId: string | null = profile.profilePhotoPublicId ?? null;
+
+    if (file) {
+        const { secure_url, public_id } = await retry(
+            () => uploadImage(file.buffer, 'healthcare/profiles'),
+            3,
+            2000,
+            'Cloudinary profile image upload'
+        );
+
+        uploadedPublicId = public_id;
+
+        updateProfileData.profile_photo = secure_url;
+        updateProfileData.profile_photo_public_id = public_id;
+    }
+
+    let newProfile;
+    try {
+        newProfile = await userRepository.updateUserProfileById(userId, updateProfileData);
+        if (!newProfile) {
+            throw new APIError(
+                STATUS_CODES.NOT_FOUND,
+                'Profile update failed'
+            );
+        }
+    } catch (error) {
+        if (uploadedPublicId) {
+            try {
+                await retry(
+                    () => deleteImage(uploadedPublicId as string),
+                    3,
+                    2000,
+                    'Cloudinary profile image deletion'
+                );
+            } catch (cleanupError) {
+                logger.error(
+                    { cleanupError, uploadedPublicId },
+                    'Failed to clean up Cloudinary image after profile creation failure'
+                );
+            }
+        }
+        throw error;
+    }
+
+    if (uploadedPublicId && oldImagePublicId) {
+        try {
+            await retry(
+                () => deleteImage(oldImagePublicId),
+                3,
+                2000,
+                'Cloudinary old profile image deletion'
+            );
+        } catch (cleanupError) {
+            logger.error(
+                { cleanupError, oldImagePublicId },
+                'Failed to delete old profile image'
+            );
+        }
+    }
+    return newProfile;
 }
 
 export async function getProfile(userId: string) {

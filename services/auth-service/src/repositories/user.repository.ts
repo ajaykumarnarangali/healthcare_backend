@@ -1,6 +1,6 @@
 import { getPool } from "../loaders/postgresLoader.js";
 import { USER_STATUS } from "../constants/user.constants.js";
-import type { createPatientProfileBody } from "../contracts/user/schema.js";
+import type { createPatientProfileBody, updatePatientProfileBody } from "../contracts/user/schema.js";
 
 export async function getUser(email: string) {
     const pool = getPool();
@@ -131,6 +131,7 @@ export async function getProfileByUserId(userId: string) {
             up.date_of_birth AS "dateOfBirth",
             up.gender,
             up.profile_photo AS "profilePhoto",
+            up.profile_photo_public_id AS "profilePhotoPublicId",
             up.street_address AS "streetAddress",
             up.city,
             up.state,
@@ -146,6 +147,64 @@ export async function getProfileByUserId(userId: string) {
     );
 
     return result.rows[0] ?? null;
+}
+
+type UpdateProfileData = updatePatientProfileBody & {
+    profile_photo?: string;
+    profile_photo_public_id?: string;
+};
+export async function updateUserProfileById(userId: string, updateProfile: UpdateProfileData) {
+    const pool = getPool();
+    const fields: string[] = [];
+    const values: unknown[] = [];
+
+    const columnMapping: Record<keyof UpdateProfileData, string> = {
+        firstName: 'first_name',
+        lastName: 'last_name',
+        phone: 'phone',
+        dateOfBirth: 'date_of_birth',
+        gender: 'gender',
+        streetAddress: 'street_address',
+        city: 'city',
+        state: 'state',
+        country: 'country',
+        postalCode: 'postal_code',
+        profile_photo: 'profile_photo',
+        profile_photo_public_id: 'profile_photo_public_id',
+    };
+
+    Object.entries(updateProfile).forEach(([key, value]) => {
+        fields.push(
+            `${columnMapping[key as keyof UpdateProfileData]} = $${values.length + 1}`
+        );
+
+        values.push(value);
+    });
+    values.push(userId);
+
+    const query = `
+    UPDATE user_profiles
+    SET ${fields.join(',')},
+        updated_at = NOW()
+    WHERE user_id = $${values.length}
+    RETURNING 
+        user_id AS "userId",
+        first_name AS "firstName",
+        last_name AS "lastName",
+        phone,
+        date_of_birth AS "dateOfBirth",
+        gender,
+        profile_photo AS "profilePhoto",
+        street_address AS "streetAddress",
+        city,
+        state,
+        country,
+        postal_code AS "postalCode",
+        profile_completed AS "profileCompleted";    
+    `
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
 }
 
 export async function isProfileExists(userId: string): Promise<boolean> {
