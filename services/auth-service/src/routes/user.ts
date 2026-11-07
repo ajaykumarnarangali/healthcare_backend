@@ -35,7 +35,7 @@ export const userRoutes = s.router(userContract, {
     getUserProfile: {
         middleware: [
             authenticate,
-            rateLimiter(rateLimitConfig.getProfile)
+            // rateLimiter(rateLimitConfig.getProfile)
         ],
         handler: async (r) => callController(userController.getProfile)(r),
     }

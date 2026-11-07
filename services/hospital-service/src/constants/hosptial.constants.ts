@@ -1,0 +1,4 @@
+export const HOSPITAL_STATUS = {
+    ACTIVE: "ACTIVE",
+    IN_ACTIVE: "IN_ACTIVE"
+}
