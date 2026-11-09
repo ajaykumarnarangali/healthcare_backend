@@ -1,3 +1,0 @@
-subjectAltName = DNS:notification-service
-extendedKeyUsage = serverAuth, clientAuth
-keyUsage = digitalSignature, keyEncipherment

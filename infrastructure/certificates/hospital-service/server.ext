@@ -1,3 +1,0 @@
-subjectAltName = DNS:hospital-service
-extendedKeyUsage = serverAuth, clientAuth
-keyUsage = digitalSignature, keyEncipherment
