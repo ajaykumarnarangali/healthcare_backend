@@ -3,6 +3,7 @@ import { loadProto } from './loaders/proto.loader.js';
 import * as userHandler from './handlers/user.handler.js';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from "url";
 
 function registerGrpcService(server: grpc.Server): void {
     const userProto = loadProto('user.proto');
@@ -16,17 +17,20 @@ function registerGrpcService(server: grpc.Server): void {
 }
 
 function getCertificate() {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    
     const CERT_PATH = path.resolve(
         __dirname,
         '../../infrastructure/certificates'
     );
 
     const serverCert = fs.readFileSync(
-        path.join(CERT_PATH, 'server/server.crt')
+        path.join(CERT_PATH, 'auth-service/server.crt')
     );
 
     const serverKey = fs.readFileSync(
-        path.join(CERT_PATH, 'server/server.key')
+        path.join(CERT_PATH, 'auth-service/server.key')
     );
 
     const caCert = fs.readFileSync(

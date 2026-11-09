@@ -25,6 +25,7 @@ services:
     env_file:
       - ./services/auth-service/.env
     volumes:
+      - ./infrastructure/certificates:/app/infrastructure/certificates:ro
       - ./services/auth-service:/app
       - /app/node_modules
     environment:
