@@ -1,0 +1,3 @@
+subjectAltName = DNS:auth-service
+extendedKeyUsage = serverAuth
+keyUsage = digitalSignature, keyEncipherment
