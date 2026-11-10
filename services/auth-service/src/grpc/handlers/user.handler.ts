@@ -11,7 +11,6 @@ interface GetUserRequest {
 
 interface GetUserResponse {
     user_id: string;
-    first_name: string;
     email: string;
     role: string,
     status: string
@@ -25,7 +24,7 @@ export const getUser = async (
         const userId = call.request.user_id;
 
         // Actual business logic through service layer
-        const user = await userService.getProfile(userId);
+        const user = await userService.getUserVerificationInfo(userId);
 
         if (!user) {
             callback({
@@ -37,7 +36,6 @@ export const getUser = async (
 
         callback(null, {
             user_id: user.id,
-            first_name: user.firstName,
             email: user.email,
             role: user.role,
             status: user.status

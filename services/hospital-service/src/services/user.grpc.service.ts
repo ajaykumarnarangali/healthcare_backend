@@ -4,7 +4,6 @@ import userClient from '../grpc/client/user.grpc.client.js';
 interface GetUserResponse {
     user_id: string;
     first_name: string;
-    email: string;
     role: string,
     status: string
 }

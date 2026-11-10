@@ -191,3 +191,16 @@ export async function getProfile(userId: string) {
 
     return profile;
 }
+
+export async function getUserVerificationInfo(userId: string) {
+    const user = await userRepository.getUserById(userId);
+
+    if (!user || user.status !== USER_STATUS.ACTIVE) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'User not found or inactive'
+        );
+    }
+
+    return user;
+}

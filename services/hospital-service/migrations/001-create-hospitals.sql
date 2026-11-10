@@ -10,6 +10,7 @@ CREATE TABLE hospitals (
     website VARCHAR(255),
     description TEXT,
     image_url TEXT,
+    image_public_id VARCHAR(255),
 
     -- Hospital Status
     status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE'

@@ -12,11 +12,13 @@ type AppRequest<
     TQuery = undefined,
     TBody = undefined,
     TParams = undefined,
+    TFile = undefined
 > = {
     query: Readonly<TQuery>;
     body: Readonly<TBody>;
     params: Readonly<TParams>;
     user?: Readonly<AuthenticatedUser>;
+    file?: TFile;
     raw: Readonly<ExpressRequest>;
 };
 
@@ -24,7 +26,8 @@ type AppRequest<
 export type HospitalCreationReq = AppRequest<
     undefined,
     HospitalCreationBody,
-    undefined
+    undefined,
+    Express.Multer.File
 >;
 
 export type emptyRequest = AppRequest<

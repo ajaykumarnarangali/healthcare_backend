@@ -70,6 +70,7 @@ export const createHospitalSchema = zod.object({
 
     // Hospital Location
     latitude: zod
+        .coerce
         .number({
             invalid_type_error: "Latitude must be a number",
         })
@@ -78,6 +79,7 @@ export const createHospitalSchema = zod.object({
         .optional(),
 
     longitude: zod
+        .coerce
         .number({
             invalid_type_error: "Longitude must be a number",
         })

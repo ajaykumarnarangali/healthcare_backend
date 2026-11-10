@@ -76,6 +76,7 @@ services:
     env_file:
       - ./services/hospital-service/.env
     volumes:
+      - ./infrastructure/certificates:/app/infrastructure/certificates:ro
       - ./services/hospital-service:/app
       - /app/node_modules
     environment:
