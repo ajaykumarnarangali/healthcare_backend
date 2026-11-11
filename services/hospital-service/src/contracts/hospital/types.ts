@@ -1,6 +1,8 @@
 import type { Request as ExpressRequest } from "express";
 import type {
-    HospitalCreationBody
+    HospitalCreationBody,
+    HospitalUpdaionBody,
+    UpdateHospitalPathParam
 } from "../hospital/schema.js";
 
 type AuthenticatedUser = {
@@ -27,6 +29,13 @@ export type HospitalCreationReq = AppRequest<
     undefined,
     HospitalCreationBody,
     undefined,
+    Express.Multer.File
+>;
+
+export type HospitalUpdationReq = AppRequest<
+    undefined,
+    HospitalUpdaionBody,
+    UpdateHospitalPathParam,
     Express.Multer.File
 >;
 

@@ -13,5 +13,14 @@ export const hospitalContract = c.router({
         responses: {
             201: hospitalSchema.createHospitalResponse
         }
+    },
+    updateHospital: {
+        method: 'PATCH',
+        path: `${BASIC_ENDPOINT}/:hospitalId`,
+        pathParams: hospitalSchema.updateHospitalPathParam,
+        body: hospitalSchema.updateHospitalSchema,
+        responses: {
+            200: hospitalSchema.updateHospitalResponse
+        }
     }
 });

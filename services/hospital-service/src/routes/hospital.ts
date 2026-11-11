@@ -20,9 +20,18 @@ export const hospitalRoutes = s.router(hospitalContract, {
         middleware: [
             authenticate,
             authorize("GLOBAL_ADMIN"),
-            // rateLimiter(rateLimitConfig.createHospital),
+            rateLimiter(rateLimitConfig.createHospital),
             uploadSingleFile("hospitalImage")
         ],
         handler: async (r) => callController(hospitalController.createHospital)(r),
+    },
+    updateHospital: {
+        middleware: [
+            authenticate,
+            authorize("GLOBAL_ADMIN"),
+            // rateLimiter(rateLimitConfig.updateHospital),
+            uploadSingleFile("hospitalImage")
+        ],
+        handler: async (r) => callController(hospitalController.updateHospital)(r)
     }
 });

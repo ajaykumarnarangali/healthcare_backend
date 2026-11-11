@@ -1,5 +1,5 @@
 import * as hospitalRepository from "../repositories/hospital.repository.js";
-import { type HospitalCreationBody } from "../contracts/hospital/schema.js";
+import { type HospitalCreationBody, type HospitalUpdaionBody } from "../contracts/hospital/schema.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
 import { STATUS_CODES } from "../constants/index.js";
@@ -64,5 +64,82 @@ export async function createHospital(hospitalData: HospitalCreationBody, hospita
         }
 
         throw error;
+    }
+}
+
+interface HospitalUpdationData extends HospitalUpdaionBody {
+    image_url?: string;
+    image_public_id?: string;
+}
+export async function updateHospital(hospitalId: string, hospitalData: HospitalUpdationData,
+    hospitalImage?: Express.Multer.File) {
+
+    const hospitalUpdationData: HospitalUpdationData = { ...hospitalData };
+
+    const isHospitalExist = await hospitalRepository.findHospitalById(hospitalId);
+    if (!isHospitalExist) {
+        throw new APIError(STATUS_CODES.NOT_FOUND, "Hospital is not exist");
+    }
+
+    let newPublicImageId: string | undefined;
+    let oldImagePublicId: string | undefined = isHospitalExist.image_public_id ?? undefined;
+
+    if (hospitalImage) {
+        const { secure_url, public_id } = await retry(
+            () => uploadImage(hospitalImage.buffer, "healthcare/hospitals"),
+            3,
+            3000,
+            "Hospital image upload"
+        );
+        hospitalUpdationData.image_url = secure_url;
+        hospitalUpdationData.image_public_id = public_id;
+        newPublicImageId = public_id;
+    }
+
+    try {
+        const updatedHospital = await hospitalRepository.updateHospital(
+            hospitalId,
+            hospitalUpdationData
+        );
+
+        if (!updatedHospital) {
+            throw new APIError(
+                STATUS_CODES.NOT_FOUND,
+                'Hospital not found or update failed'
+            );
+        }
+    } catch (error) {
+        if (newPublicImageId) {
+            try {
+                await retry(
+                    () => deleteImage(newPublicImageId),
+                    3,
+                    3000,
+                    "New hospital image cleanup after update failure"
+                );
+            } catch (cleanupError) {
+                logger.error(
+                    { cleanupError, newPublicImageId },
+                    'Failed to clean up New Cloudinary image after Hospital updation failure'
+                );
+            }
+        }
+        throw error;
+    }
+
+    if (oldImagePublicId && newPublicImageId) {
+        try {
+            await retry(
+                () => deleteImage(oldImagePublicId),
+                3,
+                3000,
+                "Old hospital image cleanup after update success"
+            );
+        } catch (cleanupError) {
+            logger.error(
+                { cleanupError, oldImagePublicId },
+                'Failed to clean up old Cloudinary image after hospital update'
+            );
+        }
     }
 }

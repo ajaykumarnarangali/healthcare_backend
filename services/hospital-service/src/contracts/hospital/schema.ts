@@ -95,3 +95,14 @@ export const createHospitalResponse = zod.object({
     success: zod.boolean(),
     message: zod.string(),
 });
+
+export const updateHospitalSchema = createHospitalSchema.partial();
+export const updateHospitalPathParam = zod.object({
+    hospitalId: zod.string().uuid()
+});
+export type UpdateHospitalPathParam = zod.infer<typeof updateHospitalPathParam>;
+export type HospitalUpdaionBody = zod.infer<typeof updateHospitalSchema>;
+export const updateHospitalResponse = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+});
