@@ -12,7 +12,8 @@ export const createHospitalSchema = zod.object({
         .string({ required_error: "Hospital email is required" })
         .trim()
         .email("Please provide a valid email address")
-        .max(255, "Email cannot exceed 255 characters"),
+        .max(255, "Email cannot exceed 255 characters")
+        .regex(/^[^\s@]+@[^\s@]+\.[^\s@]+$/, "Please provide a valid email address"),
 
     phone: zod
         .string({ required_error: "Hospital phone number is required" })
@@ -105,4 +106,32 @@ export type HospitalUpdaionBody = zod.infer<typeof updateHospitalSchema>;
 export const updateHospitalResponse = zod.object({
     success: zod.boolean(),
     message: zod.string(),
+});
+
+export const getHospitalPathParam = zod.object({
+    hospitalId: zod.string().uuid()
+})
+export type GetHospitalPathParam = zod.infer<typeof getHospitalPathParam>;
+const hospitalDetailsSchema = zod.object({
+    name: zod.string(),
+    email: zod.string(),
+    phone: zod.string(),
+    website: zod.string().nullable(),
+    description: zod.string().nullable(),
+    hospitalImage: zod.string().nullable(),
+    status: zod.enum(["ACTIVE", "INACTIVE"]),
+    streetAddress: zod.string(),
+    city: zod.string(),
+    state: zod.string(),
+    country: zod.string(),
+    postalCode: zod.string().nullable(),
+    latitude: zod.number().nullable(),
+    longitude: zod.number().nullable()
+});
+export const getHospitalResponse = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+    data: zod.object({
+        hospitalDetails: hospitalDetailsSchema
+    })
 });

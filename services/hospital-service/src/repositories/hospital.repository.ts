@@ -28,7 +28,7 @@ export async function findHospitalById(id: string) {
     return result.rows[0] ?? null;
 }
 
-function generateKeyValue(hospitalData: Record<string, unknown>) {
+function generateKeyValue<T extends object>(hospitalData: T) {
     const columnMap: Record<string, string> = {
         name: "name",
         email: "email",
@@ -114,5 +114,35 @@ export async function updateHospital(
 
     const result = await pool.query(query, [...hospitalValues, hospitalId]);
 
+    return result.rows[0] ?? null;
+}
+
+export async function getHospitalDetailsById(id: string, status: string | null) {
+    const pool = getPool();
+    const query = `
+        SELECT
+            name,
+            email,
+            phone,
+            website,
+            description,
+            image_url AS "hospitalImage",
+            status,
+            street_address AS "streetAddress",
+            city,
+            state,
+            country,
+            postal_code AS "postalCode",
+            latitude,
+            longitude
+        FROM hospitals
+        WHERE id = $1  AND ($2::VARCHAR IS NULL OR status = $2)
+        LIMIT 1
+    `;
+
+    const result = await pool.query(
+        query,
+        [id, status]
+    );
     return result.rows[0] ?? null;
 }

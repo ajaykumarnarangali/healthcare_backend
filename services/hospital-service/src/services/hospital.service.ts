@@ -2,7 +2,7 @@ import * as hospitalRepository from "../repositories/hospital.repository.js";
 import { type HospitalCreationBody, type HospitalUpdaionBody } from "../contracts/hospital/schema.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
-import { STATUS_CODES } from "../constants/index.js";
+import { STATUS_CODES, type UserRole } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import { logger } from "../utils/logger.js";
 
@@ -142,4 +142,23 @@ export async function updateHospital(hospitalId: string, hospitalData: HospitalU
             );
         }
     }
+}
+
+export async function getHospital(hospitalId: string, role: UserRole) {
+
+    // TODO: Verify HOSPITAL_ADMIN hospital assignment.
+    // TODO: Verify DOCTOR hospital association.
+
+    const status: string | null =
+        role === "PATIENT" ? "ACTIVE" : null;
+
+    const hospitalDetails = await hospitalRepository.getHospitalDetailsById(hospitalId, status);
+    if (!hospitalDetails) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            "Hospital not found"
+        );
+    }
+
+    return hospitalDetails;
 }

@@ -2,7 +2,8 @@ import type { Request as ExpressRequest } from "express";
 import type {
     HospitalCreationBody,
     HospitalUpdaionBody,
-    UpdateHospitalPathParam
+    UpdateHospitalPathParam,
+    GetHospitalPathParam
 } from "../hospital/schema.js";
 
 type AuthenticatedUser = {
@@ -24,7 +25,6 @@ type AppRequest<
     raw: Readonly<ExpressRequest>;
 };
 
-
 export type HospitalCreationReq = AppRequest<
     undefined,
     HospitalCreationBody,
@@ -37,6 +37,13 @@ export type HospitalUpdationReq = AppRequest<
     HospitalUpdaionBody,
     UpdateHospitalPathParam,
     Express.Multer.File
+>;
+
+export type HospitalGetReq = AppRequest<
+    undefined,
+    undefined,
+    GetHospitalPathParam,
+    undefined
 >;
 
 export type emptyRequest = AppRequest<

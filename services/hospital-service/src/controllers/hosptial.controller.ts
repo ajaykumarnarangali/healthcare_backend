@@ -1,10 +1,10 @@
 import { APIError } from "../error/APIError.js";
-import type { Response } from "express";
-import { STATUS_CODES, USER_STATUS, USER_ROLES } from "../constants/index.js";
+import { STATUS_CODES, USER_STATUS, USER_ROLES, type UserRole } from "../constants/index.js";
 import * as hospitalService from "../services/hospital.service.js";
 import * as userService from "../services/user.grpc.service.js";
 import type {
     HospitalCreationReq,
+    HospitalGetReq,
     HospitalUpdationReq
 } from "../contracts/hospital/types.js";
 
@@ -79,4 +79,32 @@ export async function updateHospital(req: HospitalUpdationReq) {
             message: "Hospital updated successfully"
         }
     };
-} 
+}
+
+export async function getHospital(req: HospitalGetReq) {
+    const userId = req.user!.userId;
+    const role = req.user!.role;
+    const { hospitalId } = req.params;
+
+    const user = await userService.getUser(userId);
+
+    if (!user || user.status !== USER_STATUS.ACTIVE) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'User not found or inactive'
+        );
+    }
+
+    const hospitalDetails = await hospitalService.getHospital(hospitalId, role as UserRole);
+
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Hospital fetched successfully",
+            data: {
+                hospitalDetails
+            }
+        }
+    };
+}
