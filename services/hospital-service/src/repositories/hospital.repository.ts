@@ -1,5 +1,5 @@
 import { getPool } from "../loaders/postgresLoader.js";
-import type { HospitalCreationBody, HospitalUpdaionBody } from "../contracts/hospital/schema.js";
+import type { GetHospitalsPathParam, HospitalCreationBody, HospitalUpdaionBody } from "../contracts/hospital/schema.js";
 
 export async function findHospitalByEmail(email: string) {
     const pool = getPool();
@@ -145,4 +145,62 @@ export async function getHospitalDetailsById(id: string, status: string | null) 
         [id, status]
     );
     return result.rows[0] ?? null;
+}
+
+export async function getHospitalCount(): Promise<number> {
+    const pool = getPool();
+
+    const query = `
+        SELECT COUNT(*) AS total_records
+        FROM hospitals;
+    `;
+
+    const result = await pool.query(query);
+
+    return Number(result.rows[0]?.total_records ?? 0);
+}
+
+export async function getHospitalsByQuery(query: GetHospitalsPathParam) {
+    const {
+        search,
+        sortBy,
+        sortOrder,
+        limit,
+        page,
+        status
+    } = query;
+
+    const pool = getPool();
+    const offset = (page - 1) * limit;
+
+    const sqlQuery = `
+        SELECT 
+            name,
+            email,
+            phone,
+            website,
+            status,
+            street_address AS "streetAddress",
+            city,
+            state,
+            country,
+            postal_code AS "postalCode",
+            latitude,
+            longitude
+        FROM hospitals
+        WHERE name ILIKE $1
+        AND ($2 = 'ALL' OR status = $2)
+        ORDER BY ${sortBy} ${sortOrder}
+        LIMIT $3
+        OFFSET $4;
+    `;
+
+    const result = await pool.query(sqlQuery, [
+        search,
+        status,
+        limit,
+        offset
+    ]);
+
+    return result.rows;
 }

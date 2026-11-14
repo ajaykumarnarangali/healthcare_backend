@@ -3,7 +3,8 @@ import type {
     HospitalCreationBody,
     HospitalUpdaionBody,
     UpdateHospitalPathParam,
-    GetHospitalPathParam
+    GetHospitalPathParam,
+    GetHospitalsPathParam
 } from "../hospital/schema.js";
 
 type AuthenticatedUser = {
@@ -43,6 +44,13 @@ export type HospitalGetReq = AppRequest<
     undefined,
     undefined,
     GetHospitalPathParam,
+    undefined
+>;
+
+export type HospitalsGetReq = AppRequest<
+    GetHospitalsPathParam,
+    undefined,
+    undefined,
     undefined
 >;
 

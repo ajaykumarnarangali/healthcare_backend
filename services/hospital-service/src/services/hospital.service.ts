@@ -1,10 +1,14 @@
 import * as hospitalRepository from "../repositories/hospital.repository.js";
-import { type HospitalCreationBody, type HospitalUpdaionBody } from "../contracts/hospital/schema.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
 import { STATUS_CODES, type UserRole } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import { logger } from "../utils/logger.js";
+import {
+    type HospitalCreationBody,
+    type HospitalUpdaionBody,
+    type GetHospitalsPathParam
+} from "../contracts/hospital/schema.js";
 
 interface HospitalCreationData extends HospitalCreationBody {
     image_url?: string;
@@ -161,4 +165,51 @@ export async function getHospital(hospitalId: string, role: UserRole) {
     }
 
     return hospitalDetails;
+}
+
+export async function getHospitals(query: GetHospitalsPathParam) {
+    const {
+        search,
+        sortBy,
+        sortOrder,
+        limit,
+        page,
+        status
+    } = query;
+
+    let searchTerm = "%";
+
+    if (search) {
+        searchTerm = `%${search}%`;
+    }
+    const allowedSortColumns = ["name", "city", "created_at"] as const;
+    const allowedSortOrders = ["ASC", "DESC"] as const;
+
+
+    if (!allowedSortColumns.includes(sortBy)) {
+        throw new APIError(STATUS_CODES.BAD_REQUEST, "Invalid sort column");
+    }
+
+    if (!allowedSortOrders.includes(sortOrder)) {
+        throw new APIError(STATUS_CODES.BAD_REQUEST, "Invalid sort order");
+    }
+
+    const updatedQuery: GetHospitalsPathParam = {
+        ...query, search: searchTerm,
+        limit: Number(limit) || 10,
+        page: Number(page) || 1,
+        status: status || "ALL"
+    }
+    const hospitalCount = await hospitalRepository.getHospitalCount();
+    const hospitalsData = await hospitalRepository.getHospitalsByQuery(updatedQuery);
+
+    return {
+        hospitals: hospitalsData,
+        pagination: {
+            totalRecords: hospitalCount,
+            totalPages: Math.ceil(hospitalCount / query.limit),
+            currentPage: query.page,
+            limit: query.limit
+        }
+    };
 }

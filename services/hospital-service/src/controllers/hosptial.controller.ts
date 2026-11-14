@@ -1,10 +1,10 @@
 import { APIError } from "../error/APIError.js";
-import { STATUS_CODES, USER_STATUS, USER_ROLES, type UserRole } from "../constants/index.js";
+import { STATUS_CODES, type UserRole } from "../constants/index.js";
 import * as hospitalService from "../services/hospital.service.js";
-import * as userService from "../services/user.grpc.service.js";
 import type {
     HospitalCreationReq,
     HospitalGetReq,
+    HospitalsGetReq,
     HospitalUpdationReq
 } from "../contracts/hospital/types.js";
 
@@ -59,6 +59,24 @@ export async function getHospital(req: HospitalGetReq) {
             message: "Hospital fetched successfully",
             data: {
                 hospitalDetails
+            }
+        }
+    };
+}
+
+export async function getHospitals(req: HospitalsGetReq) {
+    const query = req.query;
+
+    const { hospitals, pagination } = await hospitalService.getHospitals(query);
+
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Hospital fetched successfully",
+            data: {
+                hospitals,
+                pagination
             }
         }
     };
