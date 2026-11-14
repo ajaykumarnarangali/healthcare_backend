@@ -12,24 +12,6 @@ export async function createHospital(req: HospitalCreationReq) {
 
     const hospitalData = req.body;
     const hospitalImage = req.file;
-    const userId = req.user!.userId;
-
-    const user = await userService.getUser(userId);
-
-    if (!user || user.status !== USER_STATUS.ACTIVE) {
-        throw new APIError(
-            STATUS_CODES.NOT_FOUND,
-            'User not found or inactive'
-        );
-    }
-
-    if (user.role !== USER_ROLES.GLOBAL_ADMIN) {
-        throw new APIError(
-            STATUS_CODES.FORBIDDEN,
-            'Only global administrators can perform this action'
-        );
-    }
-
     await hospitalService.createHospital(hospitalData, hospitalImage);
 
     return {
@@ -44,29 +26,12 @@ export async function createHospital(req: HospitalCreationReq) {
 export async function updateHospital(req: HospitalUpdationReq) {
     const hospitalData = req.body;
     const hospitalImage = req.file;
-    const userId = req.user!.userId;
     const { hospitalId } = req.params;
 
     if (!hospitalImage && Object.keys(hospitalData).length === 0) {
         throw new APIError(
             STATUS_CODES.BAD_REQUEST,
             'At least one detail or a new image is required'
-        );
-    }
-
-    const user = await userService.getUser(userId);
-
-    if (!user || user.status !== USER_STATUS.ACTIVE) {
-        throw new APIError(
-            STATUS_CODES.NOT_FOUND,
-            'User not found or inactive'
-        );
-    }
-
-    if (user.role !== USER_ROLES.GLOBAL_ADMIN) {
-        throw new APIError(
-            STATUS_CODES.FORBIDDEN,
-            'Only global administrators can perform this action'
         );
     }
 
@@ -82,18 +47,8 @@ export async function updateHospital(req: HospitalUpdationReq) {
 }
 
 export async function getHospital(req: HospitalGetReq) {
-    const userId = req.user!.userId;
     const role = req.user!.role;
     const { hospitalId } = req.params;
-
-    const user = await userService.getUser(userId);
-
-    if (!user || user.status !== USER_STATUS.ACTIVE) {
-        throw new APIError(
-            STATUS_CODES.NOT_FOUND,
-            'User not found or inactive'
-        );
-    }
 
     const hospitalDetails = await hospitalService.getHospital(hospitalId, role as UserRole);
 

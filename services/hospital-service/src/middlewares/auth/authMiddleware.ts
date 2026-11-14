@@ -1,10 +1,11 @@
 import jwt from "jsonwebtoken";
 import type { Request, Response, NextFunction } from "express";
 import { APIError } from "../../error/APIError.js";
-import { STATUS_CODES, ALLOWED_ROLES, type UserRole } from "../../constants/index.js";
+import { STATUS_CODES, ALLOWED_ROLES, type UserRole, USER_STATUS } from "../../constants/index.js";
+import * as userService from "../../services/user.grpc.service.js";
 
 
-export function authenticate(req: Request, res: Response, next: NextFunction) {
+export async function authenticate(req: Request, res: Response, next: NextFunction) {
 
     const authorization = req.headers.authorization;
 
@@ -58,6 +59,22 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
             );
         }
 
+        const user = await userService.getUser(sub);
+        if (!user || user.status !== USER_STATUS.ACTIVE) {
+            return next(new APIError(
+                STATUS_CODES.NOT_FOUND,
+                'User not found or inactive'
+            ));
+        }
+
+        if (user.role !== role) {
+            return next(
+                new APIError(
+                    STATUS_CODES.FORBIDDEN,
+                    "You are not authorized to access this resource"
+                )
+            );
+        }
         req.user = {
             userId: sub,
             role: role as UserRole,
