@@ -188,7 +188,7 @@ export async function getHospitalsByQuery(query: UpdatedHospitalQuery) {
             street_address AS "streetAddress",
             city,
             state,
-            country,
+            country
         FROM hospitals
         WHERE name ILIKE $1
         AND ($2 = 'ALL' OR status = $2)

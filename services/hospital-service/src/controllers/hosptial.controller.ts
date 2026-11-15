@@ -7,6 +7,7 @@ import type {
     HospitalsGetReq,
     HospitalUpdationReq
 } from "../contracts/hospital/types.js";
+import { getHospitalsQuerySchema } from "../contracts/hospital/schema.js";
 
 export async function createHospital(req: HospitalCreationReq) {
 
@@ -66,8 +67,9 @@ export async function getHospital(req: HospitalGetReq) {
 
 export async function getHospitals(req: HospitalsGetReq) {
     const query = req.query;
+    const result = getHospitalsQuerySchema.parse(query)
 
-    const { hospitals, pagination } = await hospitalService.getHospitals(query);
+    const { hospitals, pagination } = await hospitalService.getHospitals(result);
 
     return {
         status: STATUS_CODES.OK,
