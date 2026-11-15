@@ -1,7 +1,6 @@
 import { initServer } from "@ts-rest/express";
 import { hospitalContract } from "../contracts/hospital/hospital.js";
 import * as hospitalController from "../controllers/hosptial.controller.js";
-import type { Response } from "express";
 import {
     callController
 } from "../utils/ts-rest-adapter.js";
@@ -33,6 +32,14 @@ export const hospitalRoutes = s.router(hospitalContract, {
             uploadSingleFile("hospitalImage")
         ],
         handler: async (r) => callController(hospitalController.updateHospital)(r)
+    },
+    getAllHospitals: {
+        middleware: [
+            authenticate,
+            authorize("GLOBAL_ADMIN"),
+            rateLimiter(rateLimitConfig.updateHospital),
+        ],
+        handler: async (r) => callController(hospitalController.getHospitals)(r)
     },
     getHospital: {
         middleware: [

@@ -137,8 +137,8 @@ export const getHospitalResponse = zod.object({
 });
 
 export const getHospitalsQuerySchema = zod.object({
-    page: zod.coerce.number().int().min(1).default(1),
-    limit: zod.coerce.number().int().min(1).max(100).default(10),
+    page: zod.string().default("1"),
+    limit: zod.string().default("10"),
     search: zod.string().trim().optional(),
     status: zod.enum(["ALL", "ACTIVE", "INACTIVE"]).default("ALL"),
     sortBy: zod.enum(["name", "city", "created_at"]).default("created_at"),

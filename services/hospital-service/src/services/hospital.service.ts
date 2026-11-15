@@ -1,8 +1,9 @@
-import * as hospitalRepository from "../repositories/hospital.repository.js";
+import { getRedisClient } from "../loaders/redisLoader.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
-import { STATUS_CODES, type UserRole } from "../constants/index.js";
+import { STATUS_CODES, type UserRole, REDIS_KEYS } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
+import * as hospitalRepository from "../repositories/hospital.repository.js";
 import { logger } from "../utils/logger.js";
 import {
     type HospitalCreationBody,
@@ -40,6 +41,16 @@ export async function createHospital(hospitalData: HospitalCreationBody, hospita
     try {
 
         const hospital = await hospitalRepository.createHospital(hospitalCreationData);
+
+        const redisClient = getRedisClient();
+        const redisKey = REDIS_KEYS.HOSPITAL_COUNT;
+        await retry(
+            () => redisClient.incr(redisKey),
+            3,
+            2000,
+            "incrementing hospital count"
+        );
+
         logger.info(
             { hospitalId: hospital.id, email: hospital.email },
             "Hospital created successfully"
@@ -194,22 +205,79 @@ export async function getHospitals(query: GetHospitalsPathParam) {
         throw new APIError(STATUS_CODES.BAD_REQUEST, "Invalid sort order");
     }
 
-    const updatedQuery: GetHospitalsPathParam = {
-        ...query, search: searchTerm,
+    type UpdatedHospitalQuery = Omit<GetHospitalsPathParam, "page" | "limit"> & {
+        page: number;
+        limit: number;
+    };
+    const updatedQuery: UpdatedHospitalQuery = {
+        ...query,
+        search: searchTerm,
         limit: Number(limit) || 10,
         page: Number(page) || 1,
         status: status || "ALL"
+    };
+
+    const redisClient = getRedisClient();
+    const redisKey = REDIS_KEYS.HOSPITAL_COUNT;
+
+    let hospitalCount: number | null = await retry(
+        async () => {
+            const value = await redisClient.get(redisKey);
+            const parsedCount = value === null ? null : Number(value);
+
+            return parsedCount !== null && Number.isFinite(parsedCount)
+                ? parsedCount
+                : null;
+        },
+        3,
+        2000,
+        "getting total hospital count"
+    );
+
+    if (hospitalCount === null) {
+        hospitalCount = await hospitalRepository.getHospitalCount();
+
+        await retry(
+            () => redisClient.set(redisKey, Number(hospitalCount), { EX: 604800 }),
+            3,
+            2000,
+            "caching total hospital count"
+        );
     }
-    const hospitalCount = await hospitalRepository.getHospitalCount();
-    const hospitalsData = await hospitalRepository.getHospitalsByQuery(updatedQuery);
+
+    const [hospitalsResult, countResult] = await Promise.allSettled([
+        hospitalRepository.getHospitalsByQuery(updatedQuery),
+        hospitalRepository.getHospitalCountByQuery(updatedQuery)
+    ]);
+
+    if (hospitalsResult.status === "rejected") {
+        throw new APIError(
+            STATUS_CODES.INTERNAL_SERVER_ERROR,
+            "Failed to fetch hospitals"
+        );
+    }
+
+    if (countResult.status === "rejected") {
+        throw new APIError(
+            STATUS_CODES.INTERNAL_SERVER_ERROR,
+            "Failed to fetch hospital count"
+        );
+    }
+
+    const hospitalsData = hospitalsResult.value;
+    const filteredHospitalCount = countResult.value;
+    const totalPages = filteredHospitalCount
+        ? Math.ceil(filteredHospitalCount / updatedQuery.limit)
+        : 0;
 
     return {
         hospitals: hospitalsData,
         pagination: {
             totalRecords: hospitalCount,
-            totalPages: Math.ceil(hospitalCount / query.limit),
-            currentPage: query.page,
-            limit: query.limit
+            totalQueryMatchRecord: filteredHospitalCount,
+            totalPages,
+            currentPage: updatedQuery.page,
+            limit: updatedQuery.limit
         }
     };
 }

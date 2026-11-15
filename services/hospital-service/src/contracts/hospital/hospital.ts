@@ -23,6 +23,14 @@ export const hospitalContract = c.router({
             200: hospitalSchema.updateHospitalResponse
         }
     },
+    getAllHospitals: {
+        method: 'GET',
+        path: `${BASIC_ENDPOINT}/admin/list`,
+        query: hospitalSchema.getHospitalsQuerySchema,
+        responses: {
+            200: hospitalSchema.getHospitalsResponse
+        }
+    },
     getHospital: {
         method: 'GET',
         path: `${BASIC_ENDPOINT}/:hospitalId`,
@@ -31,12 +39,4 @@ export const hospitalContract = c.router({
             200: hospitalSchema.getHospitalResponse
         }
     },
-    getAllHospitals: {
-        method: 'GET',
-        path: `${BASIC_ENDPOINT}/admin`,
-        query: hospitalSchema.getHospitalsQuerySchema,
-        responses: {
-            200: hospitalSchema.getHospitalsResponse
-        }
-    }
 });

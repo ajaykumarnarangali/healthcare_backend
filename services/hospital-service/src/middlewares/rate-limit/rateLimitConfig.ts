@@ -3,7 +3,8 @@ const FIFTEEN_MINUTES = 15 * 60 * 1000;
 export type RateLimitEndpoint =
     | "createHospital"
     | "updateHospital"
-    | "getHospital";
+    | "getHospital"
+    | "getHospitals_admin";
 
 export type RateLimitConfig = {
     name: string,
@@ -31,6 +32,11 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
         windowMs: FIFTEEN_MINUTES,
         limit: 5,
         keyTypes: ["ip", "userId"]
+    },
+    getHospitals_admin: {
+        name: "hospitals:admin",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 25,
+        keyTypes: ["ip", "userId"]
     }
-
 } as const;

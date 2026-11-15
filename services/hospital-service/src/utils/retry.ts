@@ -11,7 +11,7 @@ export async function retry<T>(
     retries: number,
     delayMs: number,
     operation: string
-): Promise<T> {
+): Promise<any> {
     try {
         return await fn();
     } catch (error) {

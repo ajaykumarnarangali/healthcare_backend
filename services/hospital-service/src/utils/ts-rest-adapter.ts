@@ -1,3 +1,5 @@
+import type { RequestHandler } from "express";
+
 export function callController(controller: Function) {
     return async (r: any) => {
         const request = {
@@ -25,5 +27,16 @@ export function callControllerWithResponse(controller: Function) {
         };
 
         return controller(request, r.res);
+    };
+}
+
+
+function adaptMiddleware(middleware: RequestHandler) {
+    return async ({ req, res, next }: any) => {
+        return middleware(
+            req as any,
+            res,
+            next
+        );
     };
 }

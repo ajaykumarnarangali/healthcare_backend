@@ -160,7 +160,12 @@ export async function getHospitalCount(): Promise<number> {
     return Number(result.rows[0]?.total_records ?? 0);
 }
 
-export async function getHospitalsByQuery(query: GetHospitalsPathParam) {
+type UpdatedHospitalQuery = Omit<GetHospitalsPathParam, "page" | "limit"> & {
+    page: number;
+    limit: number;
+};
+
+export async function getHospitalsByQuery(query: UpdatedHospitalQuery) {
     const {
         search,
         sortBy,
@@ -184,9 +189,6 @@ export async function getHospitalsByQuery(query: GetHospitalsPathParam) {
             city,
             state,
             country,
-            postal_code AS "postalCode",
-            latitude,
-            longitude
         FROM hospitals
         WHERE name ILIKE $1
         AND ($2 = 'ALL' OR status = $2)
@@ -203,4 +205,21 @@ export async function getHospitalsByQuery(query: GetHospitalsPathParam) {
     ]);
 
     return result.rows;
+}
+
+export async function getHospitalCountByQuery(query: UpdatedHospitalQuery): Promise<number> {
+    const { search, status } = query;
+
+    const pool = getPool();
+
+    const sqlQuery = `
+        SELECT COUNT(*) AS total_records
+        FROM hospitals
+        WHERE name ILIKE $1
+        AND ($2 = 'ALL' OR status = $2);
+    `;
+
+    const result = await pool.query(sqlQuery, [search, status]);
+
+    return Number(result.rows[0]?.total_records ?? 0);
 }
