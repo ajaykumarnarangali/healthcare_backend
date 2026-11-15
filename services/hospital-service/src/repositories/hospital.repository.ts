@@ -180,15 +180,14 @@ export async function getHospitalsByQuery(query: UpdatedHospitalQuery) {
 
     const sqlQuery = `
         SELECT 
+            id,
             name,
             email,
-            phone,
-            website,
             status,
-            street_address AS "streetAddress",
             city,
             state,
-            country
+            country,
+            created_at AS "createdAt"
         FROM hospitals
         WHERE name ILIKE $1
         AND ($2 = 'ALL' OR status = $2)

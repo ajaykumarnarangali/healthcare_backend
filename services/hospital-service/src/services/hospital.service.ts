@@ -274,7 +274,7 @@ export async function getHospitals(query: GetHospitalsPathParam) {
         hospitals: hospitalsData,
         pagination: {
             totalRecords: hospitalCount,
-            totalQueryMatchRecord: filteredHospitalCount,
+            totalQueryMatchRecords: filteredHospitalCount,
             totalPages,
             currentPage: updatedQuery.page,
             limit: updatedQuery.limit
