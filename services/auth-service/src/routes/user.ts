@@ -38,5 +38,13 @@ export const userRoutes = s.router(userContract, {
             // rateLimiter(rateLimitConfig.getProfile)
         ],
         handler: async (r) => callController(userController.getProfile)(r),
+    },
+    getUsersByQuery: {
+        middleware: [
+            authenticate,
+            authorize("GLOBAL_ADMIN"),
+            // rateLimiter(rateLimitConfig.getUsersByQuery)
+        ],
+        handler: async (r) => callController(userController.getUsersByQuery)(r),
     }
 });

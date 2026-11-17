@@ -1,5 +1,5 @@
 import type { Request as ExpressRequest } from "express";
-import type { createPatientProfileBody, updatePatientProfileBody } from "../user/schema.js";
+import type { createPatientProfileBody, GetUsersPathParam, updatePatientProfileBody } from "../user/schema.js";
 
 type AuthenticatedUser = {
     userId: string;
@@ -34,7 +34,15 @@ export type updateProfileRequest = AppRequest<
     Express.Multer.File
 >
 
+export type getUserByQueryRequest = AppRequest<
+    GetUsersPathParam,
+    undefined,
+    undefined,
+    undefined
+>
+
 export type emptyRequest = AppRequest<
+    undefined,
     undefined,
     undefined,
     undefined

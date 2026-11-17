@@ -27,7 +27,16 @@ export const userContract = c.router({
         method: 'GET',
         path: `${BASIC_ENDPOINT}/profile`,
         responses: {
-            201: userSchema.getProfileResponseSchema
+            200: userSchema.getProfileResponseSchema
+        }
+    },
+
+    getUsersByQuery: {
+        method: 'GET',
+        path: `${BASIC_ENDPOINT}/`,
+        query: userSchema.getUsersQuerySchema,
+        responses: {
+            200: userSchema.getUsersResponseSchema
         }
     }
 })

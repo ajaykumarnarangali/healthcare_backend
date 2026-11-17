@@ -1,10 +1,14 @@
 import * as userRepository from "../repositories/user.repository.js";
-import { type createPatientProfileBody, type updatePatientProfileBody } from "../contracts/user/schema.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
 import { STATUS_CODES, USER_STATUS } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import { logger } from "../utils/logger.js";
+import {
+    type createPatientProfileBody,
+    type GetUsersPathParam,
+    type updatePatientProfileBody
+} from "../contracts/user/schema.js";
 
 
 export async function createProfile(
@@ -203,4 +207,105 @@ export async function getUserVerificationInfo(userId: string) {
     }
 
     return user;
+}
+
+export async function getUsersByQuery(query: GetUsersPathParam) {
+    const {
+        role,
+        page,
+        search,
+        status,
+    } = query;
+
+    let searchTerm = "%";
+
+    if (search) {
+        searchTerm = `%${search}%`;
+    }
+
+    type UpdatedUserQuery = Omit<GetUsersPathParam, "page" | "limit"> & {
+        page: number;
+        limit: number;
+    };
+    const updatedQuery: UpdatedUserQuery = {
+        ...query,
+        search: searchTerm,
+        limit: Math.min(Number(query.limit) || 10, 50),
+        page: Number(page) || 1,
+        status: status || "ALL"
+    };
+
+    // DOCTOR
+    // doctor id, firstName ,lastName,from this service
+    // speciality,isLicenseVerified from docotro service
+    //hospitalAffiliations from hosptial servcie
+
+    //PATIENT
+    //id, firstName ,lastName, registeredAt,status from this service
+    //appointmentCount from appointment service
+
+    //HOSPITAL_ADMIN
+    //id,firstName,lastName,email,phone,isProfileCompleted,status from this service
+    //assignedHospital from hospital service
+
+    const [
+        totalUserCountResult,
+        usersResult,
+        filteredUserCountResult
+    ] = await Promise.allSettled([
+        userRepository.getUserCountByRole(role),
+        userRepository.getUsersByQuery(updatedQuery),
+        userRepository.getUsersCountByQuery(updatedQuery)
+    ]);
+
+    if (usersResult.status === "rejected") {
+        throw new APIError(
+            STATUS_CODES.INTERNAL_SERVER_ERROR,
+            "Failed to fetch users"
+        );
+    }
+    const usersData = usersResult.value;
+    const userIds = usersData.map((data) => data.id);
+
+    const totalUserCount =
+        totalUserCountResult.status === "fulfilled" ? totalUserCountResult.value : 0;
+    const filteredUserCount =
+        filteredUserCountResult.status === "fulfilled" ? filteredUserCountResult.value : 0;
+
+
+    switch (role) {
+        case "DOCTOR": {
+            //need to do further service call when done that part
+            break;
+        }
+        case "PATIENT": {
+            //need to do further service call when done that part
+            break;
+        }
+        case "HOSPITAL_ADMIN": {
+            //need to do further service call when done that part
+            break;
+        }
+        default:
+            throw new APIError(
+                STATUS_CODES.BAD_REQUEST,
+                "Invalid user role"
+            );
+    }
+
+    const totalPages = filteredUserCount
+        ? Math.ceil(filteredUserCount / updatedQuery.limit)
+        : 0;
+
+
+    return {
+        users: usersData,
+        pagination: {
+            totalRecords: totalUserCount,
+            totalQueryMatchRecords: filteredUserCount,
+            totalPages,
+            currentPage: updatedQuery.page,
+            limit: updatedQuery.limit
+        }
+    };
 }

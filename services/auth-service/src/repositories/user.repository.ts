@@ -1,6 +1,6 @@
 import { getPool } from "../loaders/postgresLoader.js";
-import { USER_STATUS } from "../constants/user.constants.js";
-import type { createPatientProfileBody, updatePatientProfileBody } from "../contracts/user/schema.js";
+import { USER_STATUS, type UserRole } from "../constants/user.constants.js";
+import type { createPatientProfileBody, GetUsersPathParam, updatePatientProfileBody } from "../contracts/user/schema.js";
 
 export async function getUser(email: string) {
     const pool = getPool();
@@ -289,4 +289,119 @@ export async function createUserProfile(
     const result = await pool.query(query, values);
 
     return result.rows[0];
+}
+
+
+export async function getUserCountByRole(
+    role: Exclude<UserRole, "GLOBAL_ADMIN">
+) {
+    const pool = getPool();
+
+    const query = `
+        SELECT COUNT(*) AS user_count
+        FROM users
+        WHERE role = $1
+    `;
+
+    const result = await pool.query(query, [role]);
+
+    return Number(result.rows[0].user_count);
+}
+
+type UpdatedUserQuery = Omit<GetUsersPathParam, "page" | "limit"> & {
+    page: number;
+    limit: number;
+};
+export async function getUsersByQuery(query: UpdatedUserQuery) {
+    const {
+        role,
+        limit,
+        page,
+        search,
+        sortOrder,
+        status,
+    } = query;
+
+    const offset = (page - 1) * limit;
+    const columns = {
+        DOCTOR: `
+        u.id,
+        up.first_name AS "firstName",
+        up.last_name AS "lastName"
+    `,
+        PATIENT: `
+        u.id,
+        up.first_name AS "firstName",
+        up.last_name AS "lastName",
+        u.created_at AS "registeredAt",
+        u.status AS "status"
+    `,
+        HOSPITAL_ADMIN: `
+        u.id,
+        up.first_name AS "firstName",
+        up.last_name AS "lastName",
+        u.email AS "email",
+        up.phone AS "phone",
+        up.profile_completed AS "isProfileCompleted",
+        u.status AS "status"
+    `
+    };
+
+    const roleRequiredFields = columns[role];
+
+    const pool = getPool();
+    const dbQuery = `
+        SELECT
+            ${roleRequiredFields}
+        FROM users AS u
+        JOIN user_profiles AS up
+            ON u.id = up.user_id
+        WHERE u.role = $1
+        AND (
+            up.first_name ILIKE $2
+            OR up.last_name ILIKE $2
+        )
+        AND ($3='ALL' OR u.status = $3)
+        ORDER BY u.created_at ${sortOrder}
+        LIMIT $4
+        OFFSET $5
+`;
+
+    const values = [
+        role,
+        search,
+        status,
+        limit,
+        offset
+    ];
+
+    const result = await pool.query(dbQuery, values);
+    return result.rows;
+}
+
+export async function getUsersCountByQuery(query: UpdatedUserQuery) {
+    const {
+        role,
+        search,
+        status,
+    } = query;
+    const pool = getPool();
+    const dbQuery = `
+        SELECT COUNT(*) as users_count
+        FROM users AS u
+        JOIN user_profiles AS up
+            ON u.id = up.user_id
+        WHERE u.role = $1
+        AND (
+            up.first_name ILIKE $2
+            OR up.last_name ILIKE $2
+        )
+        AND ($3='ALL' OR u.status = $3)
+`;
+    const values = [
+        role, search, status
+    ]
+
+    const result = await pool.query(dbQuery, values);
+    return Number(result.rows[0]?.users_count ?? 0);
 }

@@ -85,3 +85,42 @@ export const updatePatientProfileResponseSchema = profileResponseSchema
 
 export type updatePatientProfileBody =
     z.infer<typeof updatePatientProfileSchema>;
+
+
+export const getUsersQuerySchema = z.object({
+    page: z.string()
+        .regex(/^[1-9]\d*$/, "Page must be a positive integer")
+        .default("1"),
+
+    limit: z.string()
+        .regex(/^[1-9]\d*$/, "Limit must be a positive integer")
+        .default("10")
+        .refine((value) => Number(value) <= 50, "Limit cannot exceed 50"),
+
+    search: z.string()
+        .trim()
+        .max(100, "Search term cannot exceed 100 characters")
+        .optional(),
+
+    role: z.enum(
+        ["PATIENT", "DOCTOR", "HOSPITAL_ADMIN"],
+        { invalid_type_error: "Invalid role. Allowed roles: PATIENT, DOCTOR, HOSPITAL_ADMIN" }
+    ),
+
+    status: z.enum(
+        ["ALL", "ACTIVE", "INACTIVE"],
+        { invalid_type_error: "Invalid status. Allowed values: ALL, ACTIVE, INACTIVE" }
+    ).default("ALL"),
+
+    sortOrder: z.enum(
+        ["ASC", "DESC"],
+        { "invalid_type_error": "Invalid sort order. Allowed values: ASC, DESC" }
+    ).default("DESC"),
+});
+
+export type GetUsersPathParam = z.infer<typeof getUsersQuerySchema>;
+export const getUsersResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string(),
+    data: z.array(z.any()),
+});

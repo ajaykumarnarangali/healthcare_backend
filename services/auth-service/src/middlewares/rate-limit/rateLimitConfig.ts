@@ -10,7 +10,8 @@ export type RateLimitEndpoint =
     | "signOut"
     | "createProfile"
     | "getProfile"
-    | "updateProfile";
+    | "updateProfile"
+    | "getUsersByQuery";
 
 export type RateLimitConfig = {
     name: string,
@@ -88,6 +89,13 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
         name: "get:profile",
         windowMs: FIFTEEN_MINUTES,
         limit: 10,
+        keyTypes: ["ip", "userId"]
+    },
+
+    getUsersByQuery: {
+        name: "get:users-byquery",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 25,
         keyTypes: ["ip", "userId"]
     }
 } as const;

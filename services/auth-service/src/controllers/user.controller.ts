@@ -4,8 +4,10 @@ import * as userService from "../services/user.service.js";
 import type {
     emptyRequest,
     createProfileRequest,
-    updateProfileRequest
+    updateProfileRequest,
+    getUserByQueryRequest
 } from "../contracts/user/types.js";
+import { getUsersQuerySchema } from "../contracts/user/schema.js";
 
 
 export async function createProfile(req: createProfileRequest) {
@@ -84,4 +86,22 @@ export async function getProfile(req: emptyRequest) {
             }
         }
     }
+}
+
+export async function getUsersByQuery(req: getUserByQueryRequest) {
+    const query = req.query;
+    const result = getUsersQuerySchema.parse(query);
+    const { users, pagination } = await userService.getUsersByQuery(result);
+
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Users fetched successfully",
+            data: {
+                users,
+                pagination
+            }
+        }
+    };
 }

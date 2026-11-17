@@ -361,5 +361,5 @@ async function createUserandProile(role: UserRole) {
 }
 
 // generateDoctorLicence();
-await createUserandProile("DOCTOR");
-await createUserandProile("PATIENT");
+// await createUserandProile("DOCTOR");
+// await createUserandProile("PATIENT");
