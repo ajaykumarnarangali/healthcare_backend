@@ -47,3 +47,14 @@ export const getUser = async (
         });
     }
 };
+
+
+export interface GetInvitedHospitalIdsRequest { }
+export interface GetInvitedHospitalIdsResponse {
+    hospital_ids: string[];
+}
+export const getInvitedHospitalIds = (
+    call: ServerUnaryCall<GetInvitedHospitalIdsRequest, GetInvitedHospitalIdsResponse>,
+    callback: sendUnaryData<GetInvitedHospitalIdsResponse>) => {
+
+}

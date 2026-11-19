@@ -31,6 +31,14 @@ export const hospitalContract = c.router({
             200: hospitalSchema.getHospitalsResponse
         }
     },
+    getHospitalsSummary: {
+        method: 'GET',
+        path: `${BASIC_ENDPOINT}/admin/summary`,
+        query: hospitalSchema.getHospitalsSummaryQuerySchema,
+        responses: {
+            200: hospitalSchema.getHospitalsSummaryResponse
+        }
+    },
     getHospital: {
         method: 'GET',
         path: `${BASIC_ENDPOINT}/:hospitalId`,
@@ -38,5 +46,5 @@ export const hospitalContract = c.router({
         responses: {
             200: hospitalSchema.getHospitalResponse
         }
-    },
+    }
 });

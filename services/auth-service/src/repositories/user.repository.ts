@@ -327,7 +327,8 @@ export async function getUsersByQuery(query: UpdatedUserQuery) {
         DOCTOR: `
         u.id,
         up.first_name AS "firstName",
-        up.last_name AS "lastName"
+        up.last_name AS "lastName",
+        u.status AS "status"
     `,
         PATIENT: `
         u.id,

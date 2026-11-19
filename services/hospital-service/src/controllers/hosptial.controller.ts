@@ -5,9 +5,10 @@ import type {
     HospitalCreationReq,
     HospitalGetReq,
     HospitalsGetReq,
+    HospitalsSummaryGetReq,
     HospitalUpdationReq
 } from "../contracts/hospital/types.js";
-import { getHospitalsQuerySchema } from "../contracts/hospital/schema.js";
+import { getHospitalsQuerySchema, getHospitalsSummaryQuerySchema } from "../contracts/hospital/schema.js";
 
 export async function createHospital(req: HospitalCreationReq) {
 
@@ -71,6 +72,24 @@ export async function getHospitals(req: HospitalsGetReq) {
 
     const { hospitals, pagination } = await hospitalService.getHospitals(result);
 
+    return {
+        status: STATUS_CODES.OK,
+        body: {
+            success: true,
+            message: "Hospital fetched successfully",
+            data: {
+                hospitals,
+                pagination
+            }
+        }
+    };
+}
+
+export async function getHospitalsSummary(req: HospitalsSummaryGetReq) {
+    const query = req.query;
+    const result = getHospitalsSummaryQuerySchema.parse(query)
+
+    const { hospitals, pagination } = await hospitalService.getHospitalsSummary(result);
     return {
         status: STATUS_CODES.OK,
         body: {

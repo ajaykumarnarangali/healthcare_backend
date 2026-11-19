@@ -8,7 +8,8 @@ import { logger } from "../utils/logger.js";
 import {
     type HospitalCreationBody,
     type HospitalUpdaionBody,
-    type GetHospitalsPathParam
+    type GetHospitalsPathParam,
+    type GetHospitalsSummaryPathParam
 } from "../contracts/hospital/schema.js";
 
 interface HospitalCreationData extends HospitalCreationBody {
@@ -280,4 +281,28 @@ export async function getHospitals(query: GetHospitalsPathParam) {
             limit: updatedQuery.limit
         }
     };
+}
+
+export async function getHospitalsSummary(query: GetHospitalsSummaryPathParam) {
+    const { limit, page, search } = query;
+    let searchTerm = "%";
+
+    if (search) {
+        searchTerm = `%${search}%`;
+    }
+
+    type UpdatedHospitalSummaryQuery = Omit<GetHospitalsSummaryPathParam, "page" | "limit"> & {
+        page: number;
+        limit: number;
+    };
+    const updatedQuery: UpdatedHospitalSummaryQuery = {
+        search: searchTerm,
+        limit: Number(limit) || 10,
+        page: Number(page) || 1
+    };
+
+    return {
+        hospitals: [],
+        pagination: {}
+    }
 }

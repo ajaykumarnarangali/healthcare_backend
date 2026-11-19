@@ -19,3 +19,12 @@ export const USER_STATUS = {
     ACTIVE: "ACTIVE",
     SUSPENDED: "SUSPENDED",
 } as const;
+
+export const INVITATION_STATUS = {
+    PENDING: "PENDING",
+    ACCEPTING: "ACCEPTING",
+    ACCEPTED: "ACCEPTED",
+    REVOKED: "REVOKED",
+    EXPIRED: "EXPIRED",
+    FAILED: "FAILED",
+} as const;

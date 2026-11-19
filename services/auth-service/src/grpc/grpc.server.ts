@@ -12,6 +12,7 @@ function registerGrpcService(server: grpc.Server): void {
         (userProto.user as any).UserService.service,
         {
             GetUser: userHandler.getUser,
+            GetInvitedHospitalIds: userHandler.getInvitedHospitalIds
         }
     );
 }

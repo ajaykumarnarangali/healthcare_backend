@@ -150,3 +150,16 @@ export const getHospitalsResponse = zod.object({
     message: zod.string(),
     data: zod.array(zod.any()),
 });
+
+
+export const getHospitalsSummaryQuerySchema = zod.object({
+    page: zod.string().default("1"),
+    limit: zod.string().default("10"),
+    search: zod.string().trim().optional()
+});
+export type GetHospitalsSummaryPathParam = zod.infer<typeof getHospitalsSummaryQuerySchema>;
+export const getHospitalsSummaryResponse = zod.object({
+    success: zod.boolean(),
+    message: zod.string(),
+    data: zod.array(zod.any()),
+});
