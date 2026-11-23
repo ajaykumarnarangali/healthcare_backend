@@ -4,6 +4,7 @@ import { retry } from "../utils/retry.js";
 import { STATUS_CODES, type UserRole, REDIS_KEYS } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import * as hospitalRepository from "../repositories/hospital.repository.js";
+import * as userGrpcService from "../services/user.grpc.service.js";
 import { logger } from "../utils/logger.js";
 import {
     type HospitalCreationBody,
@@ -300,9 +301,17 @@ export async function getHospitalsSummary(query: GetHospitalsSummaryPathParam) {
         limit: Number(limit) || 10,
         page: Number(page) || 1
     };
+    const { hospital_ids } = await userGrpcService.getAdminAssociatedHospIds();
+
+    const hospitalsData = await hospitalRepository.getHospitalSummaryByQuery(updatedQuery, hospital_ids);
+    const hasNextPage = hospitalsData.length === updatedQuery.limit;
 
     return {
-        hospitals: [],
-        pagination: {}
+        hospitals: hospitalsData,
+        pagination: {
+            currentPage: updatedQuery.page,
+            limit: updatedQuery.limit,
+            hasNextPage
+        }
     }
 }

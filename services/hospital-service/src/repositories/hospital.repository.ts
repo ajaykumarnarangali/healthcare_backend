@@ -1,5 +1,5 @@
 import { getPool } from "../loaders/postgresLoader.js";
-import type { GetHospitalsPathParam, HospitalCreationBody, HospitalUpdaionBody } from "../contracts/hospital/schema.js";
+import type { GetHospitalsPathParam, GetHospitalsSummaryPathParam, HospitalCreationBody, HospitalUpdaionBody } from "../contracts/hospital/schema.js";
 
 export async function findHospitalByEmail(email: string) {
     const pool = getPool();
@@ -221,4 +221,37 @@ export async function getHospitalCountByQuery(query: UpdatedHospitalQuery): Prom
     const result = await pool.query(sqlQuery, [search, status]);
 
     return Number(result.rows[0]?.total_records ?? 0);
+}
+
+type UpdatedHospitalSummaryQuery = Omit<GetHospitalsSummaryPathParam, "page" | "limit"> & {
+    page: number;
+    limit: number;
+};
+export async function getHospitalSummaryByQuery(query: UpdatedHospitalSummaryQuery, hospital_ids: string[]) {
+    const pool = getPool();
+    const {
+        page,
+        limit,
+        search
+    } = query;
+    const offset = (page - 1) * limit;
+
+    const sqlQuery = `
+      SELECT id,name,city,state 
+      FROM hospitals
+      WHERE (name ILIKE $1 OR city ILIKE $1 OR state ILIKE $1)
+        AND id != ALL($2::uuid[])
+      LIMIT $3
+      OFFSET $4;
+    `;
+
+    const values = [
+        search,
+        hospital_ids,
+        limit,
+        offset
+    ]
+
+    const result = await pool.query(sqlQuery, values);
+    return result.rows;
 }

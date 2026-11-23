@@ -4,6 +4,7 @@ import {
     status,
 } from '@grpc/grpc-js';
 import * as userService from "../../services/user.service.js";
+import * as invitationRepository from "../../repositories/invitation.repository.js";
 
 interface GetUserRequest {
     user_id: string;
@@ -53,8 +54,16 @@ export interface GetInvitedHospitalIdsRequest { }
 export interface GetInvitedHospitalIdsResponse {
     hospital_ids: string[];
 }
-export const getInvitedHospitalIds = (
+
+export const getAdminAssociatedHospIds = async (
     call: ServerUnaryCall<GetInvitedHospitalIdsRequest, GetInvitedHospitalIdsResponse>,
     callback: sendUnaryData<GetInvitedHospitalIdsResponse>) => {
-
+    try {
+        const hospitalIds = await invitationRepository.getAdminAssociatedHospitals();
+        callback(null, {
+            hospital_ids: hospitalIds
+        });
+    } catch (error) {
+        callback(error as Error, null);
+    }
 }

@@ -21,3 +21,21 @@ export function getUser(userId: string): Promise<any> {
         );
     });
 }
+
+interface GetAdminAssociatedHospRes {
+    hospital_ids: string[];
+}
+export function getAdminAssociatedHospIds(): Promise<GetAdminAssociatedHospRes> {
+    return new Promise((resolve, reject) => {
+        userClient.getInvitedHospitalIds(
+            {},
+            (error: grpc.ServiceError | null, response: GetAdminAssociatedHospRes) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                resolve(response);
+            }
+        );
+    });
+}
