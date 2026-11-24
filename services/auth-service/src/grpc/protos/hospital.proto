@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package hospital;
+
+service HospitalService {
+    rpc ValidateHospitalAdminAssignment (ValidateHospitalAdminAssignmentRequest)
+        returns (ValidateHospitalAdminAssignmentResponse);
+}
+
+message ValidateHospitalAdminAssignmentRequest {
+    string hospital_id = 1;
+}
+
+message ValidateHospitalAdminAssignmentResponse {
+    bool exists = 1;
+    bool is_active = 2;
+    bool admin_assigned = 3;
+}

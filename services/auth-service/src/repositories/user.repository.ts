@@ -406,3 +406,24 @@ export async function getUsersCountByQuery(query: UpdatedUserQuery) {
     const result = await pool.query(dbQuery, values);
     return Number(result.rows[0]?.users_count ?? 0);
 }
+
+export async function getInvitationByEmailOrHospitalId(
+    email: string,
+    hospital_id: string
+) {
+    const pool = getPool();
+
+    const query = `
+        SELECT *
+        FROM admin_invitations
+        WHERE (email = $1 OR hospital_id = $2)
+        AND status IN ('PENDING', 'ACCEPTING', 'ACCEPTED')
+        LIMIT 1
+    `;
+
+    const values = [email, hospital_id];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0] ?? null;
+}

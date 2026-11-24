@@ -40,7 +40,7 @@ function generateUserClient() {
     );
 
     const userClient = new userProto.user.UserService(
-        process.env.USER_GRPC_URL || 'USER_GRPC_URL=auth-service:50051',
+        process.env.USER_GRPC_URL || 'auth-service:50051',
         credentials
     );
 

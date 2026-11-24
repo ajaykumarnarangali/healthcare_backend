@@ -5,7 +5,8 @@ import type {
     emptyRequest,
     createProfileRequest,
     updateProfileRequest,
-    getUserByQueryRequest
+    getUserByQueryRequest,
+    inviteHospitalAdminRequest
 } from "../contracts/user/types.js";
 import { getUsersQuerySchema } from "../contracts/user/schema.js";
 
@@ -104,4 +105,23 @@ export async function getUsersByQuery(req: getUserByQueryRequest) {
             }
         }
     };
+}
+
+export async function inviteHospitalAdmin(req: inviteHospitalAdminRequest) {
+    const { userId } = req.user!;
+    const payLoad = req.body;
+    
+    if (payLoad.email !== payLoad.confirmEmail) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            'Email addresses do not match'
+        );
+    }
+
+    await userService.inviteHospitalAdmin(userId, payLoad);
+
+    return {
+        status: 201,
+        body: "User Invited Successfully"
+    }
 }

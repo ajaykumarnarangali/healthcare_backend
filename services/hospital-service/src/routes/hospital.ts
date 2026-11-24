@@ -45,7 +45,7 @@ export const hospitalRoutes = s.router(hospitalContract, {
         middleware: [
             authenticate,
             authorize("GLOBAL_ADMIN"),
-            rateLimiter(rateLimitConfig.getHospitals_summary_admin),
+            // rateLimiter(rateLimitConfig.getHospitals_summary_admin),
         ],
         handler: async (r) => callController(hospitalController.getHospitalsSummary)(r)
     },

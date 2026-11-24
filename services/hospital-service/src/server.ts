@@ -1,4 +1,5 @@
 import { Loader, app } from './app.js';
+import { initGrpcServer } from './grpc/grpc.server.js';
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -10,4 +11,5 @@ dotenv.config();
     app.listen(PORT, () => {
         console.log("Server running successfully on port", PORT);
     });
+    initGrpcServer();
 })();

@@ -1,10 +1,13 @@
 import * as userRepository from "../repositories/user.repository.js";
+import * as hospitalService from "../services/hospital.grpc.service.js";
+import { hashVerificationToken, generateVerificationToken } from "../utils/token.utils.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
-import { STATUS_CODES, USER_STATUS } from "../constants/index.js";
+import { STATUS_CODES, USER_ROLES, USER_STATUS } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import { logger } from "../utils/logger.js";
 import {
+    type adminInviteBody,
     type createPatientProfileBody,
     type GetUsersPathParam,
     type updatePatientProfileBody
@@ -308,4 +311,58 @@ export async function getUsersByQuery(query: GetUsersPathParam) {
             limit: updatedQuery.limit
         }
     };
+}
+
+export async function inviteHospitalAdmin(userId: string, payLoad: adminInviteBody) {
+
+    const user = await userRepository.getUserById(userId);
+    const {
+        email,
+        name,
+        hospital_id
+    } = payLoad;
+
+    if (!user || user.status !== USER_STATUS.ACTIVE) {
+        throw new APIError(
+            STATUS_CODES.NOT_FOUND,
+            'User not found or inactive'
+        );
+    }
+
+    if (user.role != USER_ROLES.GLOBAL_ADMIN) {
+        throw new APIError(
+            STATUS_CODES.FORBIDDEN,
+            'Permission denied'
+        );
+    }
+
+    const [existInvitedUser, existInvitation] = await Promise.all([
+        userRepository.getUser(email),
+        userRepository.getInvitationByEmailOrHospitalId(email, hospital_id)
+    ]);
+
+    if (existInvitedUser || existInvitation) {
+        throw new APIError(
+            STATUS_CODES.CONFLICT,
+            'Unable to process this invitation'
+        );
+    }
+
+    const response = await hospitalService.getHospitalAdminAssignment(hospital_id);
+
+    console.log("hospital admin response", response);
+
+    const token = generateVerificationToken();
+    const hashedToken = hashVerificationToken(token);
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const invitationData = {
+        name,
+        email,
+        token_hash: hashedToken,
+        invited_by: user.id,
+        hospital_id,
+        status: 'PENDING',
+        expires_at: expiresAt
+    }
+
 }

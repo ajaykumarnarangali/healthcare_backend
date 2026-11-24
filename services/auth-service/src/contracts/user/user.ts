@@ -38,5 +38,14 @@ export const userContract = c.router({
         responses: {
             200: userSchema.getUsersResponseSchema
         }
-    }
+    },
+
+    inviteHospitalAdmin: {
+        method: 'POST',
+        path: `${BASIC_ENDPOINT}/invitations/hospital-admin`,
+        body: userSchema.adminInviteSchema,
+        responses: {
+            201: userSchema.inviteResponseSchema
+        }
+    },
 })

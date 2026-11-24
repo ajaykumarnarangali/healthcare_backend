@@ -46,5 +46,13 @@ export const userRoutes = s.router(userContract, {
             // rateLimiter(rateLimitConfig.getUsersByQuery)
         ],
         handler: async (r) => callController(userController.getUsersByQuery)(r),
+    },
+    inviteHospitalAdmin: {
+        middleware: [
+            authenticate,
+            authorize("GLOBAL_ADMIN"),
+            // rateLimiter(rateLimitConfig.inviteHospitalAdmin)
+        ],
+        handler: async (r) => callController(userController.inviteHospitalAdmin)(r),
     }
 });

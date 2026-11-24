@@ -124,3 +124,37 @@ export const getUsersResponseSchema = z.object({
     message: z.string(),
     data: z.array(z.any()),
 });
+
+export const adminInviteSchema = z.object({
+    name: z.string()
+        .trim()
+        .min(1, 'Name is required')
+        .min(2, 'Name must be at least 2 characters')
+        .max(100, 'Name must not exceed 100 characters'),
+
+    email: z.string()
+        .trim()
+        .toLowerCase()
+        .min(1, 'Email is required')
+        .regex(
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            'Please enter a valid email address'
+        ),
+
+    confirmEmail: z.string()
+        .trim()
+        .toLowerCase()
+        .min(1, 'Confirm email is required')
+        .regex(
+            /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+            'Please enter a valid email address'
+        ),
+
+    hospital_id: z.string()
+        .uuid('Please provide a valid hospital ID')
+});
+export type adminInviteBody = z.infer<typeof adminInviteSchema>
+export const inviteResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+});

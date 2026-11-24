@@ -11,7 +11,8 @@ export type RateLimitEndpoint =
     | "createProfile"
     | "getProfile"
     | "updateProfile"
-    | "getUsersByQuery";
+    | "getUsersByQuery"
+    | "inviteHospitalAdmin";
 
 export type RateLimitConfig = {
     name: string,
@@ -94,6 +95,13 @@ export const rateLimitConfig: Record<RateLimitEndpoint, RateLimitConfig> = {
 
     getUsersByQuery: {
         name: "get:users-byquery",
+        windowMs: FIFTEEN_MINUTES,
+        limit: 25,
+        keyTypes: ["ip", "userId"]
+    },
+
+    inviteHospitalAdmin: {
+        name: "invite:hospital-admin",
         windowMs: FIFTEEN_MINUTES,
         limit: 25,
         keyTypes: ["ip", "userId"]

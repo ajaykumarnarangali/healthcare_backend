@@ -12,8 +12,7 @@ CREATE TYPE invitation_status AS ENUM (
 CREATE TABLE admin_invitations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL,
 
     token_hash TEXT NOT NULL UNIQUE,
