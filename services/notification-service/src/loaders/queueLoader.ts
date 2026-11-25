@@ -35,15 +35,31 @@ export async function initRabbitMQ() {
             { durable: true }
         );
 
+        // Main notification queue
         await rabbitChannel.assertQueue(
             rabbitmq.NOTIFICATION_QUEUE,
             { durable: true }
         );
 
-        await rabbitChannel.bindQueue(
-            rabbitmq.NOTIFICATION_QUEUE,
-            rabbitmq.RABBITMQ_EXCHANGE,
-            rabbitmq.USER_EMAIL_VERIFICATION_REQUESTED
+        // Dead letter queue
+        await rabbitChannel.assertQueue(
+            rabbitmq.NOTIFICATION_DLQ,
+            { durable: true }
+        );
+
+        const routingKeys = [
+            rabbitmq.RABBITMQ_ROUTING_KEYS.USER_EMAIL_VERIFICATION_REQUESTED,
+            rabbitmq.RABBITMQ_ROUTING_KEYS.USER_HOSPITAL_ADMIN_INVITATION_REQUESTED,
+        ];
+
+        await Promise.all(
+            routingKeys.map((routingKey) =>
+                rabbitChannel.bindQueue(
+                    rabbitmq.NOTIFICATION_QUEUE,
+                    rabbitmq.RABBITMQ_EXCHANGE,
+                    routingKey
+                )
+            )
         );
 
         console.log("RabbitMQ exchange and queue initialized");

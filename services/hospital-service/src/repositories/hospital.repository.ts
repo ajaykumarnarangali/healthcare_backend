@@ -14,11 +14,25 @@ export async function findHospitalByEmail(email: string) {
     return result.rows[0] ?? null;
 }
 
+export async function checkHospitalAssignment(hospitalId: string): Promise<boolean> {
+    const pool = getPool();
+
+    const result = await pool.query(
+        `SELECT 1
+         FROM hospital_admins
+         WHERE hospital_id = $1
+         LIMIT 1`,
+        [hospitalId]
+    );
+
+    return result.rowCount !== 0;
+}
+
 export async function findHospitalById(id: string) {
     const pool = getPool();
 
     const result = await pool.query(
-        `SELECT id, image_public_id
+        `SELECT id,status, image_public_id
          FROM hospitals
          WHERE id = $1
          LIMIT 1`,

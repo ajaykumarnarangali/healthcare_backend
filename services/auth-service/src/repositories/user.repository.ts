@@ -427,3 +427,42 @@ export async function getInvitationByEmailOrHospitalId(
 
     return result.rows[0] ?? null;
 }
+
+export type CreateInvitationInput = {
+    name: string;
+    email: string;
+    token_hash: string;
+    invited_by: string;
+    hospital_id: string;
+    expires_at: Date;
+};
+export async function createInvitation(invitationData: CreateInvitationInput) {
+
+    const pool = getPool();
+    const query = `
+        INSERT INTO admin_invitations (
+            name,
+            email,
+            token_hash,
+            invited_by,
+            hospital_id,
+            expires_at  
+        )
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING id, name, email, hospital_id, invited_by, status, expires_at, created_at
+    `;
+
+    const values = [
+        invitationData.name,
+        invitationData.email,
+        invitationData.token_hash,
+        invitationData.invited_by,
+        invitationData.hospital_id,
+        invitationData.expires_at
+    ];
+
+    const result = await pool.query(query, values);
+
+    return result.rows[0];
+
+}

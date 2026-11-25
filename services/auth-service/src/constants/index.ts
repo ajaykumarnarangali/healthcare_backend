@@ -1,6 +1,6 @@
 import {
     RABBITMQ_EXCHANGE,
-    USER_EMAIL_VERIFICATION_REQUESTED,
+    RABBITMQ_ROUTING_KEYS,
 } from "./rabbitmq.constants.js";
 
 import { STATUS_CODES } from "./statusCodes.js";
@@ -11,7 +11,7 @@ import { REDIS_KEYS } from "./redis.keys.js";
 
 export {
     RABBITMQ_EXCHANGE,
-    USER_EMAIL_VERIFICATION_REQUESTED,
+    RABBITMQ_ROUTING_KEYS,
     USER_ROLES,
     REDIS_KEYS,
     USER_STATUS,

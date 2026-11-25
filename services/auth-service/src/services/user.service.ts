@@ -3,7 +3,7 @@ import * as hospitalService from "../services/hospital.grpc.service.js";
 import { hashVerificationToken, generateVerificationToken } from "../utils/token.utils.js";
 import { APIError } from "../error/APIError.js";
 import { retry } from "../utils/retry.js";
-import { STATUS_CODES, USER_ROLES, USER_STATUS } from "../constants/index.js";
+import { RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEYS, STATUS_CODES, USER_ROLES, USER_STATUS } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import { logger } from "../utils/logger.js";
 import {
@@ -12,6 +12,7 @@ import {
     type GetUsersPathParam,
     type updatePatientProfileBody
 } from "../contracts/user/schema.js";
+import { getRabbitMQChannel } from "../loaders/queueLoader.js";
 
 
 export async function createProfile(
@@ -349,8 +350,18 @@ export async function inviteHospitalAdmin(userId: string, payLoad: adminInviteBo
     }
 
     const response = await hospitalService.getHospitalAdminAssignment(hospital_id);
+    const {
+        exists,
+        is_active,
+        admin_assigned
+    } = response;
 
-    console.log("hospital admin response", response);
+    if (!exists || !is_active || admin_assigned) {
+        throw new APIError(
+            STATUS_CODES.CONFLICT,
+            'Unable to process this invitation'
+        );
+    }
 
     const token = generateVerificationToken();
     const hashedToken = hashVerificationToken(token);
@@ -361,8 +372,36 @@ export async function inviteHospitalAdmin(userId: string, payLoad: adminInviteBo
         token_hash: hashedToken,
         invited_by: user.id,
         hospital_id,
-        status: 'PENDING',
         expires_at: expiresAt
     }
 
+    const invitation = await userRepository.createInvitation(invitationData);
+    if (!invitation) {
+        throw new APIError(
+            STATUS_CODES.INTERNAL_SERVER_ERROR,
+            "Unable to process this invitation"
+        );
+    }
+
+    const queueData = {
+        eventId: crypto.randomUUID(),
+        email: invitation.email,
+        name: invitation.name,
+        token
+    }
+
+    const rabbitChannel = getRabbitMQChannel();
+
+    await retry(
+        () => rabbitChannel.publish(
+            RABBITMQ_EXCHANGE,
+            RABBITMQ_ROUTING_KEYS.USER_HOSPITAL_ADMIN_INVITATION_REQUESTED,
+            Buffer.from(JSON.stringify(queueData))
+        ),
+        3,
+        3000,
+        "Publish hospital admin invitation event to RabbitMQ"
+    );
+
+    return invitation.id;
 }

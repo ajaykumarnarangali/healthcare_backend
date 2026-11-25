@@ -110,7 +110,7 @@ export async function getUsersByQuery(req: getUserByQueryRequest) {
 export async function inviteHospitalAdmin(req: inviteHospitalAdminRequest) {
     const { userId } = req.user!;
     const payLoad = req.body;
-    
+
     if (payLoad.email !== payLoad.confirmEmail) {
         throw new APIError(
             STATUS_CODES.BAD_REQUEST,
@@ -122,6 +122,9 @@ export async function inviteHospitalAdmin(req: inviteHospitalAdminRequest) {
 
     return {
         status: 201,
-        body: "User Invited Successfully"
+        body: {
+            succes: true,
+            message: "User Invited Successfully"
+        }
     }
 }

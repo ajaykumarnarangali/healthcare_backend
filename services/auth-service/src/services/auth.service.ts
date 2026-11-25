@@ -11,7 +11,7 @@ import {
     REDIS_KEYS,
     STATUS_CODES,
     RABBITMQ_EXCHANGE,
-    USER_EMAIL_VERIFICATION_REQUESTED,
+    RABBITMQ_ROUTING_KEYS,
 } from "../constants/index.js";
 import {
     verifyJWTToken,
@@ -81,7 +81,7 @@ export async function registerPatient(email: string, password: string) {
         () =>
             rabbitChannel.publish(
                 RABBITMQ_EXCHANGE,
-                USER_EMAIL_VERIFICATION_REQUESTED,
+                RABBITMQ_ROUTING_KEYS.USER_EMAIL_VERIFICATION_REQUESTED,
                 Buffer.from(
                     JSON.stringify({
                         eventId,
@@ -169,7 +169,7 @@ export async function registerDoctor(email: string, password: string) {
         () =>
             rabbitChannel.publish(
                 RABBITMQ_EXCHANGE,
-                USER_EMAIL_VERIFICATION_REQUESTED,
+                RABBITMQ_ROUTING_KEYS.USER_EMAIL_VERIFICATION_REQUESTED,
                 Buffer.from(
                     JSON.stringify({
                         eventId,

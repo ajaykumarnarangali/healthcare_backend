@@ -23,6 +23,5 @@ export async function sendEmail(email: string, subject: string, html: string) {
         3,
         2000,
         "Sending account verification email"
-    );
-    
+    ); 
 }
