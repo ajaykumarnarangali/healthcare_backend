@@ -93,7 +93,7 @@ export async function createInvitation(invitationData: CreateInvitationInput) {
 
 }
 
-export async function updateInvitationStatus(id: string, status: "ACCEPTED" | "FAILED" | "REVOKED") {
+export async function updateInvitationStatus(id: string, status: "ACCEPTED" | "FAILED" | "REVOKED" | "EXPIRED") {
     const pool = getPool();
     const acceptedAt = status === "ACCEPTED" ? new Date() : null;
     const query = `

@@ -421,6 +421,10 @@ export async function acceptInvitation(token: string, password: string) {
     }
 
     if (invitation.expires_at <= new Date()) {
+        await invitationRepository.updateInvitationStatus(
+            invitation.id,
+            "EXPIRED"
+        );
         throw new APIError(
             STATUS_CODES.BAD_REQUEST,
             "Invitation expired"
@@ -453,30 +457,30 @@ export async function acceptInvitation(token: string, password: string) {
     }
 
     const password_hash = await bcrypt.hash(password, 12);
-    const userId = await userRepository.createUser(invitation.email, password_hash, USER_ROLES.HOSPITAL_ADMIN);
+    const user = await userRepository.createUser(invitation.email, password_hash, USER_ROLES.HOSPITAL_ADMIN);
 
     try {
-        const assignedResponse = await hospitalService.assignHospitalAdmin(userId, invitation.hospital_id);
+        const assignedResponse = await hospitalService.assignHospitalAdmin(user.id, invitation.hospital_id);
         if (!assignedResponse.assigned) {
             throw new Error("Hospital admin assignment failed");
         }
     } catch (error) {
         await Promise.all([
-            userRepository.deleteUserById(userId),
+            userRepository.deleteUserById(user.id),
             invitationRepository.updateInvitationStatus(invitation.id, "FAILED")
         ]);
         throw error;
     }
 
     try {
-        await userRepository.activateUserAccount(userId);
+        await userRepository.activateUserAccount(user.id);
         await invitationRepository.updateInvitationStatus(
             invitation.id,
             "ACCEPTED"
         );
     } catch (error) {
         logger.error(
-            { error, userId, invitationId: invitation.id },
+            { error, user, invitationId: invitation.id },
             "Failed to activate hospital admin account or update invitation status"
         );
 
