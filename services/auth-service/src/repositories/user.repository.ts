@@ -66,6 +66,21 @@ export async function getUserById(userId: string) {
     return result.rows[0];
 }
 
+export async function deleteUserById(userId: string) {
+    const pool = getPool();
+
+    const result = await pool.query(
+        `
+        DELETE FROM users
+        WHERE id = $1
+        RETURNING id
+        `,
+        [userId]
+    );
+
+    return result.rows[0] ?? null;
+}
+
 export async function getUserSummary(userId: string) {
     const pool = getPool();
 
@@ -407,62 +422,22 @@ export async function getUsersCountByQuery(query: UpdatedUserQuery) {
     return Number(result.rows[0]?.users_count ?? 0);
 }
 
-export async function getInvitationByEmailOrHospitalId(
-    email: string,
-    hospital_id: string
-) {
+export async function activateUserAccount(user_id: string) {
     const pool = getPool();
 
     const query = `
-        SELECT *
-        FROM admin_invitations
-        WHERE (email = $1 OR hospital_id = $2)
-        AND status IN ('PENDING', 'ACCEPTING', 'ACCEPTED')
-        LIMIT 1
+        UPDATE users
+        SET status = $1,
+            email_verified = TRUE,
+            updated_at = NOW()
+        WHERE id = $2
+        RETURNING id
     `;
 
-    const values = [email, hospital_id];
-
-    const result = await pool.query(query, values);
+    const result = await pool.query(query, [
+        USER_STATUS.ACTIVE,
+        user_id
+    ]);
 
     return result.rows[0] ?? null;
-}
-
-export type CreateInvitationInput = {
-    name: string;
-    email: string;
-    token_hash: string;
-    invited_by: string;
-    hospital_id: string;
-    expires_at: Date;
-};
-export async function createInvitation(invitationData: CreateInvitationInput) {
-
-    const pool = getPool();
-    const query = `
-        INSERT INTO admin_invitations (
-            name,
-            email,
-            token_hash,
-            invited_by,
-            hospital_id,
-            expires_at  
-        )
-        VALUES ($1, $2, $3, $4, $5, $6)
-        RETURNING id, name, email, hospital_id, invited_by, status, expires_at, created_at
-    `;
-
-    const values = [
-        invitationData.name,
-        invitationData.email,
-        invitationData.token_hash,
-        invitationData.invited_by,
-        invitationData.hospital_id,
-        invitationData.expires_at
-    ];
-
-    const result = await pool.query(query, values);
-
-    return result.rows[0];
-
 }

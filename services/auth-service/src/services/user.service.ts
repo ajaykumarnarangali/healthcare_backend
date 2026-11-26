@@ -1,4 +1,5 @@
 import * as userRepository from "../repositories/user.repository.js";
+import * as invitationRepository from "../repositories/invitation.repository.js";
 import * as hospitalService from "../services/hospital.grpc.service.js";
 import { hashVerificationToken, generateVerificationToken } from "../utils/token.utils.js";
 import { APIError } from "../error/APIError.js";
@@ -6,6 +7,7 @@ import { retry } from "../utils/retry.js";
 import { RABBITMQ_EXCHANGE, RABBITMQ_ROUTING_KEYS, STATUS_CODES, USER_ROLES, USER_STATUS } from "../constants/index.js";
 import { uploadImage, deleteImage } from "../utils/imageUpload.js";
 import { logger } from "../utils/logger.js";
+import bcrypt from "bcrypt";
 import {
     type adminInviteBody,
     type createPatientProfileBody,
@@ -339,7 +341,7 @@ export async function inviteHospitalAdmin(userId: string, payLoad: adminInviteBo
 
     const [existInvitedUser, existInvitation] = await Promise.all([
         userRepository.getUser(email),
-        userRepository.getInvitationByEmailOrHospitalId(email, hospital_id)
+        invitationRepository.getInvitationByEmailOrHospitalId(email, hospital_id)
     ]);
 
     if (existInvitedUser || existInvitation) {
@@ -375,7 +377,7 @@ export async function inviteHospitalAdmin(userId: string, payLoad: adminInviteBo
         expires_at: expiresAt
     }
 
-    const invitation = await userRepository.createInvitation(invitationData);
+    const invitation = await invitationRepository.createInvitation(invitationData);
     if (!invitation) {
         throw new APIError(
             STATUS_CODES.INTERNAL_SERVER_ERROR,
@@ -405,3 +407,79 @@ export async function inviteHospitalAdmin(userId: string, payLoad: adminInviteBo
 
     return invitation.id;
 }
+
+export async function acceptInvitation(token: string, password: string) {
+
+    const hashedToken = hashVerificationToken(token.trim());
+    const invitation = await invitationRepository.getInvitationByToken(hashedToken);
+
+    if (!invitation) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Unable to accept invitation"
+        );
+    }
+
+    if (invitation.expires_at <= new Date()) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Invitation expired"
+        );
+    }
+
+    const [inviter, hospitalResponse] = await Promise.all([
+        userRepository.getUserById(invitation.invited_by),
+        hospitalService.getHospitalAdminAssignment(invitation.hospital_id)
+    ]);
+
+    if (
+        !inviter ||
+        inviter.status !== USER_STATUS.ACTIVE ||
+        inviter.role !== USER_ROLES.GLOBAL_ADMIN
+    ) {
+        throw new APIError(
+            STATUS_CODES.BAD_REQUEST,
+            "Unable to accept invitation"
+        );
+    }
+
+    const { exists, is_active, admin_assigned } = hospitalResponse;
+
+    if (!exists || !is_active || admin_assigned) {
+        throw new APIError(
+            STATUS_CODES.CONFLICT,
+            "Unable to process this invitation"
+        );
+    }
+
+    const password_hash = await bcrypt.hash(password, 12);
+    const userId = await userRepository.createUser(invitation.email, password_hash, USER_ROLES.HOSPITAL_ADMIN);
+
+    try {
+        const assignedResponse = await hospitalService.assignHospitalAdmin(userId, invitation.hospital_id);
+        if (!assignedResponse.assigned) {
+            throw new Error("Hospital admin assignment failed");
+        }
+    } catch (error) {
+        await Promise.all([
+            userRepository.deleteUserById(userId),
+            invitationRepository.updateInvitationStatus(invitation.id, "FAILED")
+        ]);
+        throw error;
+    }
+
+    try {
+        await userRepository.activateUserAccount(userId);
+        await invitationRepository.updateInvitationStatus(
+            invitation.id,
+            "ACCEPTED"
+        );
+    } catch (error) {
+        logger.error(
+            { error, userId, invitationId: invitation.id },
+            "Failed to activate hospital admin account or update invitation status"
+        );
+
+        throw error;
+    }
+} 

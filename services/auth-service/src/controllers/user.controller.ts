@@ -6,7 +6,8 @@ import type {
     createProfileRequest,
     updateProfileRequest,
     getUserByQueryRequest,
-    inviteHospitalAdminRequest
+    inviteHospitalAdminRequest,
+    acceptInvitationRequest
 } from "../contracts/user/types.js";
 import { getUsersQuerySchema } from "../contracts/user/schema.js";
 
@@ -121,10 +122,26 @@ export async function inviteHospitalAdmin(req: inviteHospitalAdminRequest) {
     await userService.inviteHospitalAdmin(userId, payLoad);
 
     return {
-        status: 201,
+        status: STATUS_CODES.CREATED,
         body: {
-            succes: true,
+            success: true,
             message: "User Invited Successfully"
+        }
+    }
+}
+
+export async function acceptInvitation(req: acceptInvitationRequest) {
+
+    const { token } = req.query;
+    const { password } = req.body;
+
+    await userService.acceptInvitation(token, password);
+
+    return {
+        status: STATUS_CODES.CREATED,
+        body: {
+            success: true,
+            message: "Accepting invitation Processed Successfully"
         }
     }
 }

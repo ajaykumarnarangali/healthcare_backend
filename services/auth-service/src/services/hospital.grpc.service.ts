@@ -20,3 +20,21 @@ export function getHospitalAdminAssignment(hospitalId: string): Promise<any> {
         );
     });
 }
+
+type AssignHospitalAdminResponse = {
+    assigned: boolean
+}
+export function assignHospitalAdmin(user_id: string, hospital_id: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+        hospitalClient.AssignHospitalAdmin(
+            { user_id, hospital_id },
+            (error: grpc.ServiceError | null, response: AssignHospitalAdminResponse) => {
+                if (error) {
+                    return reject(error);
+                }
+
+                resolve(response);
+            }
+        );
+    })
+}

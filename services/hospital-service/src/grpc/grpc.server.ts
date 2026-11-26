@@ -36,7 +36,8 @@ function registerGrpcService(server: grpc.Server): void {
     server.addService(
         (hospitalProto.hospital as any).HospitalService.service,
         {
-            ValidateHospitalAdminAssignment: hospitalHandler.validateHospitalAdminAssignment
+            ValidateHospitalAdminAssignment: hospitalHandler.validateHospitalAdminAssignment,
+            AssignHospitalAdmin:hospitalHandler.assignHospitalAdmin
         }
     );
 }

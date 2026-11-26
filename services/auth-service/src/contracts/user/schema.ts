@@ -158,3 +158,35 @@ export const inviteResponseSchema = z.object({
     success: z.boolean(),
     message: z.string()
 });
+
+
+export const acceptInvitationSchema = z.object({
+    password: z.string()
+        .min(8, "Password must be at least 8 characters")
+        .max(128, "Password must not exceed 128 characters")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+        .regex(/[0-9]/, "Password must contain at least one number")
+        .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+
+    confirmPassword: z.string()
+}).superRefine((data, ctx) => {
+    if (data.password !== data.confirmPassword) {
+        ctx.addIssue({
+            code: "custom",
+            message: "Passwords do not match",
+            path: ["confirmPassword"]
+        });
+    }
+});
+export const acceptInvitationQuerySchema = z.object({
+    token: z.string()
+        .length(64, "Invalid or expired invitation link. Please request a new invitation.")
+        .regex(/^[a-f0-9]{64}$/, "Invalid or expired invitation link. Please request a new invitation.")
+});
+export type acceptInvitationQuery = z.infer<typeof acceptInvitationQuerySchema>
+export type acceptInvitationBody = z.infer<typeof acceptInvitationSchema>
+export const acceptInvitationResponseSchema = z.object({
+    success: z.boolean(),
+    message: z.string()
+});

@@ -54,5 +54,11 @@ export const userRoutes = s.router(userContract, {
             // rateLimiter(rateLimitConfig.inviteHospitalAdmin)
         ],
         handler: async (r) => callController(userController.inviteHospitalAdmin)(r),
+    },
+    acceptInvitation: {
+        middleware: [
+            // rateLimiter(rateLimitConfig.acceptInvitation)
+        ],
+        handler: async (r) => callController(userController.acceptInvitation)(r),
     }
 });

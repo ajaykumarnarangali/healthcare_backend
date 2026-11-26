@@ -269,3 +269,19 @@ export async function getHospitalSummaryByQuery(query: UpdatedHospitalSummaryQue
     const result = await pool.query(sqlQuery, values);
     return result.rows;
 }
+
+export async function assignHospitalAdmin(user_id: string, hospital_id: string) {
+    const pool = getPool();
+
+    const sqlQuery = `
+        INSERT INTO hospital_admins (user_id, hospital_id)
+        VALUES ($1, $2)
+        RETURNING id, user_id, hospital_id
+    `;
+
+    const values = [user_id, hospital_id];
+
+    const result = await pool.query(sqlQuery, values);
+
+    return result.rows[0];
+}

@@ -48,4 +48,14 @@ export const userContract = c.router({
             201: userSchema.inviteResponseSchema
         }
     },
+
+    acceptInvitation: {
+        method: 'POST',
+        path: `${BASIC_ENDPOINT}/invitations/accept`,
+        query: userSchema.acceptInvitationQuerySchema,
+        body: userSchema.acceptInvitationSchema,
+        responses: {
+            201: userSchema.acceptInvitationResponseSchema
+        }
+    }
 })

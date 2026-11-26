@@ -1,5 +1,5 @@
 import type { Request as ExpressRequest } from "express";
-import type { adminInviteBody, createPatientProfileBody, GetUsersPathParam, updatePatientProfileBody } from "../user/schema.js";
+import type { acceptInvitationBody, acceptInvitationQuery, adminInviteBody, createPatientProfileBody, GetUsersPathParam, updatePatientProfileBody } from "../user/schema.js";
 
 type AuthenticatedUser = {
     userId: string;
@@ -44,6 +44,13 @@ export type getUserByQueryRequest = AppRequest<
 export type inviteHospitalAdminRequest = AppRequest<
     undefined,
     adminInviteBody,
+    undefined,
+    undefined
+>;
+
+export type acceptInvitationRequest = AppRequest<
+    acceptInvitationQuery,
+    acceptInvitationBody,
     undefined,
     undefined
 >;
