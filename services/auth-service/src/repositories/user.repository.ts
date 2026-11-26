@@ -406,10 +406,11 @@ export async function getUsersCountByQuery(query: UpdatedUserQuery) {
     const dbQuery = `
         SELECT COUNT(*) as users_count
         FROM users AS u
-        JOIN user_profiles AS up
+        LEFT JOIN user_profiles AS up
             ON u.id = up.user_id
         WHERE u.role = $1
         AND (
+            $2 = '%' OR
             up.first_name ILIKE $2
             OR up.last_name ILIKE $2
         )
