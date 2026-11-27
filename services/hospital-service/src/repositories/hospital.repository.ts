@@ -251,12 +251,17 @@ export async function getHospitalSummaryByQuery(query: UpdatedHospitalSummaryQue
     const offset = (page - 1) * limit;
 
     const sqlQuery = `
-      SELECT id,name,city,state 
-      FROM hospitals
-      WHERE (name ILIKE $1 OR city ILIKE $1 OR state ILIKE $1)
-        AND id != ALL($2::uuid[])
-      LIMIT $3
-      OFFSET $4;
+        SELECT h.id, h.name, h.city, h.state
+        FROM hospitals h
+        WHERE (h.name ILIKE $1 OR h.city ILIKE $1 OR h.state ILIKE $1)
+        AND h.id != ALL($2::uuid[])
+        AND NOT EXISTS (
+            SELECT 1
+            FROM hospital_admins ha
+            WHERE ha.hospital_id = h.id
+        )
+        LIMIT $3
+        OFFSET $4;
     `;
 
     const values = [
