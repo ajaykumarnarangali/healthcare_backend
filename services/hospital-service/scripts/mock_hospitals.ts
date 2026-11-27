@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import { Client } from "pg";
 
 dotenv.config({
-    path: "../.env"
+    path: "../scripts.env"
 });
 
 const hospitalData = [
@@ -554,7 +554,7 @@ type Hospital = {
 };
 async function mockHospitals() {
     const client = new Client({
-        connectionString: process.env.DATABASE_URL_SCRIPT,
+        connectionString: process.env.DATABASE_HOSPITAL_URL_SCRIPT,
     });
 
     try {

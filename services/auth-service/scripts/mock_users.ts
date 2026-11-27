@@ -3,7 +3,7 @@ import { Client } from "pg";
 import type { UserRole } from "../src/constants/user.constants.js";
 
 dotenv.config({
-    path: "../.env"
+    path: "../scripts.env"
 });
 
 const doctorLicenses = [
@@ -171,9 +171,79 @@ const patientProfiles = [
     { email: "pradeep.menon@example.com", firstName: "Pradeep", lastName: "Menon", phone: "9876510030", dateOfBirth: "1987-05-20", gender: "MALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673020" }
 ];
 
+
+const hospitalAdmins = [
+    { email: "hadmin@gmail.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "arjun.nair.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "meera.menon.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "rahul.varma.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "anjali.krishnan.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "vivek.pillai.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "neha.nair.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "rohit.menon.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "kavya.radhakrishnan.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "adithya.kumar.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "diya.thomas.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "sanjay.nair.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "lakshmi.menon.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "faisal.rahman.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "sneha.pillai.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "akhil.joseph.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "divya.krishnan.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "manu.varghese.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "pooja.nair.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "nithin.kumar.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "amrutha.menon.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "jithin.thomas.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "resmi.nair.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "abin.joseph.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "gopika.krishnan.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "sreejith.menon.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "malavika.nair.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "akhila.varma.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "nikhil.pillai.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "keerthi.thomas.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true },
+    { email: "roshan.rahman.admin@example.com", passwordHash: "$2b$12$KHQkxVjS0x61F1IC64siu.Q4yWB1G1syE5qCFQrg0fXu3gjG33mI6", role: "HOSPITAL_ADMIN", status: "ACTIVE", emailVerified: true }
+];
+
+const hospitalAdminProfiles = [
+    { email: "hadmin@gmail.com", firstName: "Ajay", lastName: "Kumar", phone: "9876520001", dateOfBirth: "1995-04-12", gender: "MALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673001" },
+    { email: "arjun.nair.admin@example.com", firstName: "Arjun", lastName: "Nair", phone: "9876520002", dateOfBirth: "1985-07-23", gender: "MALE", city: "Kochi", state: "Kerala", country: "India", postalCode: "682001" },
+    { email: "meera.menon.admin@example.com", firstName: "Meera", lastName: "Menon", phone: "9876520003", dateOfBirth: "1988-02-15", gender: "FEMALE", city: "Kannur", state: "Kerala", country: "India", postalCode: "670001" },
+    { email: "rahul.varma.admin@example.com", firstName: "Rahul", lastName: "Varma", phone: "9876520004", dateOfBirth: "1982-11-08", gender: "MALE", city: "Thrissur", state: "Kerala", country: "India", postalCode: "680001" },
+    { email: "anjali.krishnan.admin@example.com", firstName: "Anjali", lastName: "Krishnan", phone: "9876520005", dateOfBirth: "1987-06-19", gender: "FEMALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673004" },
+    { email: "vivek.pillai.admin@example.com", firstName: "Vivek", lastName: "Pillai", phone: "9876520006", dateOfBirth: "1984-03-25", gender: "MALE", city: "Kochi", state: "Kerala", country: "India", postalCode: "682020" },
+    { email: "neha.nair.admin@example.com", firstName: "Neha", lastName: "Nair", phone: "9876520007", dateOfBirth: "1990-09-14", gender: "FEMALE", city: "Palakkad", state: "Kerala", country: "India", postalCode: "678001" },
+    { email: "rohit.menon.admin@example.com", firstName: "Rohit", lastName: "Menon", phone: "9876520008", dateOfBirth: "1989-01-30", gender: "MALE", city: "Kollam", state: "Kerala", country: "India", postalCode: "691001" },
+    { email: "kavya.radhakrishnan.admin@example.com", firstName: "Kavya", lastName: "Radhakrishnan", phone: "9876520009", dateOfBirth: "1983-12-05", gender: "FEMALE", city: "Kottayam", state: "Kerala", country: "India", postalCode: "686001" },
+    { email: "adithya.kumar.admin@example.com", firstName: "Adithya", lastName: "Kumar", phone: "9876520010", dateOfBirth: "1991-05-17", gender: "MALE", city: "Malappuram", state: "Kerala", country: "India", postalCode: "676505" },
+    { email: "diya.thomas.admin@example.com", firstName: "Diya", lastName: "Thomas", phone: "9876520011", dateOfBirth: "1986-08-21", gender: "FEMALE", city: "Ernakulam", state: "Kerala", country: "India", postalCode: "682011" },
+    { email: "sanjay.nair.admin@example.com", firstName: "Sanjay", lastName: "Nair", phone: "9876520012", dateOfBirth: "1988-10-11", gender: "MALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673005" },
+    { email: "lakshmi.menon.admin@example.com", firstName: "Lakshmi", lastName: "Menon", phone: "9876520013", dateOfBirth: "1980-04-28", gender: "FEMALE", city: "Kannur", state: "Kerala", country: "India", postalCode: "670002" },
+    { email: "faisal.rahman.admin@example.com", firstName: "Faisal", lastName: "Rahman", phone: "9876520014", dateOfBirth: "1992-02-09", gender: "MALE", city: "Kochi", state: "Kerala", country: "India", postalCode: "682016" },
+    { email: "sneha.pillai.admin@example.com", firstName: "Sneha", lastName: "Pillai", phone: "9876520015", dateOfBirth: "1984-07-16", gender: "FEMALE", city: "Thrissur", state: "Kerala", country: "India", postalCode: "680020" },
+    { email: "akhil.joseph.admin@example.com", firstName: "Akhil", lastName: "Joseph", phone: "9876520016", dateOfBirth: "1987-12-22", gender: "MALE", city: "Kollam", state: "Kerala", country: "India", postalCode: "691004" },
+    { email: "divya.krishnan.admin@example.com", firstName: "Divya", lastName: "Krishnan", phone: "9876520017", dateOfBirth: "1982-05-03", gender: "FEMALE", city: "Kottayam", state: "Kerala", country: "India", postalCode: "686002" },
+    { email: "manu.varghese.admin@example.com", firstName: "Manu", lastName: "Varghese", phone: "9876520018", dateOfBirth: "1990-09-27", gender: "MALE", city: "Palakkad", state: "Kerala", country: "India", postalCode: "678002" },
+    { email: "pooja.nair.admin@example.com", firstName: "Pooja", lastName: "Nair", phone: "9876520019", dateOfBirth: "1985-03-13", gender: "FEMALE", city: "Ernakulam", state: "Kerala", country: "India", postalCode: "682018" },
+    { email: "nithin.kumar.admin@example.com", firstName: "Nithin", lastName: "Kumar", phone: "9876520020", dateOfBirth: "1989-06-07", gender: "MALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673016" },
+    { email: "amrutha.menon.admin@example.com", firstName: "Amrutha", lastName: "Menon", phone: "9876520021", dateOfBirth: "1983-01-18", gender: "FEMALE", city: "Kannur", state: "Kerala", country: "India", postalCode: "670003" },
+    { email: "jithin.thomas.admin@example.com", firstName: "Jithin", lastName: "Thomas", phone: "9876520022", dateOfBirth: "1991-11-24", gender: "MALE", city: "Thrissur", state: "Kerala", country: "India", postalCode: "680005" },
+    { email: "resmi.nair.admin@example.com", firstName: "Resmi", lastName: "Nair", phone: "9876520023", dateOfBirth: "1986-02-26", gender: "FEMALE", city: "Malappuram", state: "Kerala", country: "India", postalCode: "676519" },
+    { email: "abin.joseph.admin@example.com", firstName: "Abin", lastName: "Joseph", phone: "9876520024", dateOfBirth: "1988-08-15", gender: "MALE", city: "Kochi", state: "Kerala", country: "India", postalCode: "682024" },
+    { email: "gopika.krishnan.admin@example.com", firstName: "Gopika", lastName: "Krishnan", phone: "9876520025", dateOfBirth: "1981-10-02", gender: "FEMALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673018" },
+    { email: "sreejith.menon.admin@example.com", firstName: "Sreejith", lastName: "Menon", phone: "9876520026", dateOfBirth: "1992-04-06", gender: "MALE", city: "Kottayam", state: "Kerala", country: "India", postalCode: "686003" },
+    { email: "malavika.nair.admin@example.com", firstName: "Malavika", lastName: "Nair", phone: "9876520027", dateOfBirth: "1984-12-19", gender: "FEMALE", city: "Palakkad", state: "Kerala", country: "India", postalCode: "678003" },
+    { email: "akhila.varma.admin@example.com", firstName: "Akhila", lastName: "Varma", phone: "9876520028", dateOfBirth: "1990-07-29", gender: "FEMALE", city: "Kollam", state: "Kerala", country: "India", postalCode: "691005" },
+    { email: "nikhil.pillai.admin@example.com", firstName: "Nikhil", lastName: "Pillai", phone: "9876520029", dateOfBirth: "1982-03-08", gender: "MALE", city: "Ernakulam", state: "Kerala", country: "India", postalCode: "682030" },
+    { email: "keerthi.thomas.admin@example.com", firstName: "Keerthi", lastName: "Thomas", phone: "9876520030", dateOfBirth: "1987-05-20", gender: "FEMALE", city: "Kozhikode", state: "Kerala", country: "India", postalCode: "673020" },
+    { email: "roshan.rahman.admin@example.com", firstName: "Roshan", lastName: "Rahman", phone: "9876520031", dateOfBirth: "1986-09-15", gender: "MALE", city: "Kannur", state: "Kerala", country: "India", postalCode: "670004" }
+];
+
+
 async function generateDoctorLicence() {
     const client = new Client({
-        connectionString: process.env.DATABASE_URL_SCRIPT,
+        connectionString: process.env.DATABASE_AUTH_URL_SCRIPT,
     });
 
     const query = `
@@ -209,7 +279,7 @@ async function generateDoctorLicence() {
 
 async function createUserandProile(role: UserRole) {
     const client = new Client({
-        connectionString: process.env.DATABASE_URL_SCRIPT,
+        connectionString: process.env.DATABASE_AUTH_URL_SCRIPT,
     });
 
     let userData;
@@ -223,6 +293,11 @@ async function createUserandProile(role: UserRole) {
         case "PATIENT":
             userData = patients;
             userProfileData = patientProfiles;
+            break;
+
+        case "HOSPITAL_ADMIN":
+            userData = hospitalAdmins;
+            userProfileData = hospitalAdminProfiles;
             break;
 
         default:
@@ -360,6 +435,74 @@ async function createUserandProile(role: UserRole) {
     }
 }
 
+async function assignHospitalAdminToHospital() {
+    const authClient = new Client({
+        connectionString: process.env.DATABASE_AUTH_URL_SCRIPT,
+    });
+    const hospitalClient = new Client({
+        connectionString: process.env.DATABASE_HOSPITAL_URL_SCRIPT,
+    });
+
+    try {
+
+        await authClient.connect();
+        console.log("auth database connected successfully");
+
+        await hospitalClient.connect();
+        console.log("hospital database connected successfully");
+
+        const getUserQuery = `
+            SELECT id FROM users
+            WHERE role='HOSPITAL_ADMIN'
+        `
+        const userRes = await authClient.query(getUserQuery);
+        const userIds = userRes.rows.map((each) => each.id);
+
+        const getHospitalQuery = `
+            SELECT h.id
+            FROM hospitals AS h
+            LEFT JOIN hospital_admins AS ha
+                ON h.id = ha.hospital_id
+            WHERE ha.hospital_id IS NULL;
+        `
+        const hospRes = await hospitalClient.query(getHospitalQuery);
+        const hospitalIds = hospRes.rows.map((each) => each.id);
+
+        if (userIds.length == 0 || hospitalIds.length == 0) {
+            console.log("assinging not possible");
+            return;
+        }
+
+        const values: string[] = [];
+        const params: (string | number)[] = [];
+
+        const assignments = Math.min(userIds.length, hospitalIds.length);
+
+        for (let index = 0; index < assignments; index++) {
+            const offset = index * 2;
+
+            values.push(`($${offset + 1}, $${offset + 2})`);
+            params.push(userIds[index], hospitalIds[index]);
+        }
+
+        const assignQuery = `
+            INSERT INTO hospital_admins (user_id, hospital_id)
+            VALUES ${values.join(", ")}
+        `;
+
+        await hospitalClient.query(assignQuery, params);
+        console.log('Hospital assignment successfull');
+
+
+    } catch (error) {
+        console.log(`assign Hospital failed`, error);
+    }
+}
+
+
 // generateDoctorLicence();
 // await createUserandProile("DOCTOR");
 // await createUserandProile("PATIENT");
+// await createUserandProile("HOSPITAL_ADMIN");
+
+await assignHospitalAdminToHospital()
