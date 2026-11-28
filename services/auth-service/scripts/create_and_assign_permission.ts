@@ -3,12 +3,12 @@ import { Client } from "pg";
 import type { UserRole } from "../src/constants/user.constants.js";
 
 dotenv.config({
-    path: "../.env"
+    path: "../scripts.env"
 });
 
 
 const client = new Client({
-    connectionString: process.env.DATABASE_URL_SCRIPT,
+    connectionString: process.env.DATABASE_AUTH_URL_SCRIPT,
 });
 
 const hospitalAdminPermissions = [
@@ -57,6 +57,8 @@ const globalAdminPermissions = [
     'profile:update',
     'settings:view',
     'settings:update',
+    'payment_info:view',
+    'payment_info:manage',
 ] as const;
 
 const doctorPermissions = [
@@ -83,6 +85,10 @@ const doctorPermissions = [
     'profile:update',
     'settings:view',
     'settings:update',
+    'professional_info:view',
+    'professional_info:manage',
+    'payment_info:view',
+    'payment_info:manage',
 ] as const;
 
 const patientPermissions = [

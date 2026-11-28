@@ -136,7 +136,7 @@ export async function registerDoctor(email: string, password: string) {
 
     logger.info(
         { userId: user.id },
-        "Patient user created successfully"
+        "Doctor created successfully"
     );
 
     const verificationToken = generateVerificationToken();
