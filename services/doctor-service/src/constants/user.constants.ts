@@ -1,0 +1,30 @@
+export const USER_ROLES = {
+    PATIENT: "PATIENT",
+    DOCTOR: "DOCTOR",
+    HOSPITAL_ADMIN: "HOSPITAL_ADMIN",
+    GLOBAL_ADMIN: "GLOBAL_ADMIN",
+} as const;
+
+export const ALLOWED_ROLES = ["PATIENT", "DOCTOR", "HOSPITAL_ADMIN", "GLOBAL_ADMIN"];
+
+export type UserRole =
+    | "PATIENT"
+    | "DOCTOR"
+    | "HOSPITAL_ADMIN"
+    | "GLOBAL_ADMIN";
+
+
+export const USER_STATUS = {
+    PENDING: "PENDING",
+    ACTIVE: "ACTIVE",
+    SUSPENDED: "SUSPENDED",
+} as const;
+
+export const INVITATION_STATUS = {
+    PENDING: "PENDING",
+    ACCEPTING: "ACCEPTING",
+    ACCEPTED: "ACCEPTED",
+    REVOKED: "REVOKED",
+    EXPIRED: "EXPIRED",
+    FAILED: "FAILED",
+} as const;
